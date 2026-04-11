@@ -27,18 +27,18 @@ const seedDB = async () => {
     // 1. Create Admin
     const admin = new User({
       name: 'Super Admin',
-      email: 'admin@college.com',
+      email: 'admin@gmail.com',
       password: hashedAdminPassword,
       role: 'admin'
     });
     await admin.save();
 
     // 2. Create Teachers
-    const teacher1 = new User({ name: 'Alice Smith', email: 'alice@college.com', password: hashedTeacherPassword, role: 'teacher' });
+    const teacher1 = new User({ name: 'spandhana', email: 'spandhana@gmail.com', password: hashedTeacherPassword, role: 'teacher' });
     const savedTeacher1 = await teacher1.save();
     await new Teacher({ userId: savedTeacher1._id, subject: 'Mathematics', department: 'Science' }).save();
 
-    const teacher2 = new User({ name: 'Bob Johnson', email: 'bob@college.com', password: hashedTeacherPassword, role: 'teacher' });
+    const teacher2 = new User({ name: 'navya', email: 'navya@gmail.com', password: hashedTeacherPassword, role: 'teacher' });
     const savedTeacher2 = await teacher2.save();
     await new Teacher({ userId: savedTeacher2._id, subject: 'Physics', department: 'Science' }).save();
 
@@ -46,7 +46,7 @@ const seedDB = async () => {
     for(let i = 1; i <= 3; i++) {
       const studentUser = new User({ name: `Student ${i}`, email: `student${i}@college.com`, password: hashedStudentPassword, role: 'student' });
       const savedStudent = await studentUser.save();
-      await new Student({ userId: savedStudent._id, rollNo: `CE202600${i}`, department: 'Computer Engineering' }).save();
+      await new Student({ userId: savedStudent._id, rollNo: `23VD1A05${i}`, department: 'Computer Science And Engineering' }).save();
     }
 
     console.log('Seeding completed successfully!');
