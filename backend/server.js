@@ -7,12 +7,12 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://rayudu-college-portal.vercel.app/"
-  ],
+  origin: "https://rayudu-college-portal.vercel.app",
+  methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
+app.options("*", cors());
+app.use(cors());
 app.use(express.json());
 
 // Load Routes
