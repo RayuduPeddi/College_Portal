@@ -20,18 +20,26 @@ const AdminDashboard = () => {
   // Form states for adding Teacher
   const [newTeacher, setNewTeacher] = useState({ name: '', email: '', password: '', subject: '', department: '' });
 
+  const [notices, setNotices] = useState([]);
+  const [complaints, setComplaints] = useState([]);
+  const [newNotice, setNewNotice] = useState({ title: '', content: '' });
+
   // Sidebar Menu Configuration
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard' },
     { id: 'students', label: 'Manage Students' },
     { id: 'teachers', label: 'Manage Teachers' },
-    { id: 'records', label: 'Student Records' }
+    { id: 'records', label: 'Student Records' },
+    { id: 'notices', label: 'Manage Notices' },
+    { id: 'complaints', label: 'View Complaints' }
   ];
 
   // Fetch all initial data
   useEffect(() => {
     fetchStudents();
     fetchTeachers();
+    fetchNotices();
+    fetchComplaints();
   }, []);
 
   // Fetch all students from backend
@@ -58,6 +66,26 @@ const AdminDashboard = () => {
     } catch (err) {
       console.log(err);
     }
+  };
+
+  const fetchNotices = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/api/admin/notices', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const result = await res.json();
+      if (result.success) setNotices(result.data);
+    } catch (err) { console.log(err); }
+  };
+
+  const fetchComplaints = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/api/admin/complaints', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const result = await res.json();
+      if (result.success) setComplaints(result.data);
+    } catch (err) { console.log(err); }
   };
 
   // Add a new student
@@ -152,6 +180,45 @@ const AdminDashboard = () => {
     } catch (err) {
       console.log(err);
     }
+  };
+
+  const handleAddNotice = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('http://localhost:5000/api/admin/notices', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(newNotice)
+      });
+      const result = await res.json();
+      if (result.success) {
+        alert('Notice added successfully!');
+        setNewNotice({ title: '', content: '' });
+        fetchNotices();
+      } else alert(result.message);
+    } catch (err) { console.log(err); }
+  };
+
+  const handleDeleteNotice = async (id) => {
+    if(!window.confirm('Delete this notice?')) return;
+    try {
+      const res = await fetch(`http://localhost:5000/api/admin/notices/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if ((await res.json()).success) fetchNotices();
+    } catch (err) { console.log(err); }
+  };
+
+  const handleUpdateComplaintStatus = async (id, status) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/admin/complaints/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ status })
+      });
+      if ((await res.json()).success) fetchComplaints();
+    } catch (err) { console.log(err); }
   };
 
   return (
@@ -288,16 +355,17 @@ const AdminDashboard = () => {
                   <h3>Attendance Records for {selectedStudentName}</h3>
                   <div className="table-container card-shadow">
                     <table>
-                      <thead><tr><th>Date</th><th>Status</th><th>Marked By</th></tr></thead>
+                      <thead><tr><th>Date</th><th>Subject</th><th>Status</th><th>Marked By</th></tr></thead>
                       <tbody>
                         {studentRecords.attendance.map(a => (
                           <tr key={a._id}>
                             <td>{new Date(a.date).toLocaleDateString()}</td>
+                            <td>{a.subject || 'General'}</td>
                             <td style={{ color: a.status === 'Present' ? 'green' : 'red' }}>{a.status}</td>
                             <td>{a.teacherId?.name}</td>
                           </tr>
                         ))}
-                        {studentRecords.attendance.length === 0 && <tr><td colSpan="3">No attendance records found.</td></tr>}
+                        {studentRecords.attendance.length === 0 && <tr><td colSpan="4">No attendance records found.</td></tr>}
                       </tbody>
                     </table>
                   </div>
@@ -320,6 +388,66 @@ const AdminDashboard = () => {
                   </div>
                 </>
               )}
+            </div>
+          )}
+
+          {activeTab === 'notices' && (
+            <div className="tab-section">
+              <h2>Post a New Notice</h2>
+              <form className="add-form card-shadow" onSubmit={handleAddNotice}>
+                <input required placeholder="Notice Title" value={newNotice.title} onChange={e => setNewNotice({...newNotice, title: e.target.value})} />
+                <textarea required placeholder="Notice Content" value={newNotice.content} onChange={e => setNewNotice({...newNotice, content: e.target.value})} />
+                <button type="submit" className="action-btn">Post Notice</button>
+              </form>
+
+              <h2>All Notices</h2>
+              <div className="table-container card-shadow">
+                <table>
+                  <thead><tr><th>Date</th><th>Title</th><th>Content</th><th>Action</th></tr></thead>
+                  <tbody>
+                    {notices.map(n => (
+                      <tr key={n._id}>
+                        <td>{new Date(n.date).toLocaleDateString()}</td>
+                        <td>{n.title}</td>
+                        <td>{n.content}</td>
+                        <td><button onClick={() => handleDeleteNotice(n._id)} className="delete-btn">Delete</button></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'complaints' && (
+            <div className="tab-section">
+              <h2>Student Complaints</h2>
+              <div className="table-container card-shadow">
+                <table>
+                  <thead><tr><th>Date</th><th>Student</th><th>Subject</th><th>Description</th><th>Status</th><th>Action</th></tr></thead>
+                  <tbody>
+                    {complaints.map(c => (
+                      <tr key={c._id}>
+                        <td>{new Date(c.date).toLocaleDateString()}</td>
+                        <td>{c.studentId?.name} ({c.studentId?.email})</td>
+                        <td>{c.subject}</td>
+                        <td>{c.description}</td>
+                        <td>
+                          <span className={`status-badge ${c.status?.toLowerCase()}`}>{c.status}</span>
+                        </td>
+                        <td>
+                          <select value={c.status} onChange={(e) => handleUpdateComplaintStatus(c._id, e.target.value)}>
+                            <option value="Pending">Pending</option>
+                            <option value="Reviewed">Reviewed</option>
+                            <option value="Resolved">Resolved</option>
+                          </select>
+                        </td>
+                      </tr>
+                    ))}
+                    {complaints.length === 0 && <tr><td colSpan="6">No complaints found.</td></tr>}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
 

@@ -24,4 +24,11 @@ router.delete('/teachers/:id', adminController.deleteTeacher);
 router.get('/attendance/:studentId', adminController.getStudentAttendance);
 router.get('/marks/:studentId', adminController.getStudentMarks);
 
+router.get('/notices', adminController.getAllNotices);
+router.post('/notices', adminController.createNotice);
+router.delete('/notices/:id', adminController.deleteNotice);
+
+router.get('/complaints', adminController.getAllComplaints);
+router.patch('/complaints/:id/status', adminController.updateComplaintStatus);
+
 module.exports = router;

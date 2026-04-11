@@ -3,6 +3,8 @@ const Student = require('../models/Student');
 const Teacher = require('../models/Teacher');
 const Attendance = require('../models/Attendance');
 const Marks = require('../models/Marks');
+const Notice = require('../models/Notice');
+const Complaint = require('../models/Complaint');
 const bcrypt = require('bcryptjs');
 
 const getAllStudents = async (req, res) => {
@@ -140,6 +142,60 @@ const getStudentMarks = async (req, res) => {
   }
 };
 
+const getAllNotices = async (req, res) => {
+  try {
+    const notices = await Notice.find().sort({ date: -1 });
+    res.json({ success: true, data: notices });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error fetching notices' });
+  }
+};
+
+const createNotice = async (req, res) => {
+  try {
+    const { title, content } = req.body;
+    const newNotice = new Notice({
+      title,
+      content,
+      postedBy: req.user.id
+    });
+    const savedNotice = await newNotice.save();
+    res.json({ success: true, data: savedNotice });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error creating notice' });
+  }
+};
+
+const deleteNotice = async (req, res) => {
+  try {
+    const notice = await Notice.findById(req.params.id);
+    if (!notice) return res.status(404).json({ success: false, message: 'Notice not found' });
+    await Notice.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: 'Notice deleted' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error deleting notice' });
+  }
+};
+
+const getAllComplaints = async (req, res) => {
+  try {
+    const complaints = await Complaint.find().populate('studentId', 'name email').sort({ date: -1 });
+    res.json({ success: true, data: complaints });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error fetching complaints' });
+  }
+};
+
+const updateComplaintStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const complaint = await Complaint.findByIdAndUpdate(req.params.id, { status }, { new: true });
+    res.json({ success: true, data: complaint });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error updating complaint' });
+  }
+};
+
 module.exports = {
   getAllStudents,
   addStudent,
@@ -147,5 +203,7 @@ module.exports = {
   getAllTeachers,
   addTeacher,
   deleteTeacher,
-  getStudentAttendance, getStudentMarks
+  getStudentAttendance, getStudentMarks,
+  getAllNotices, createNotice, deleteNotice,
+  getAllComplaints, updateComplaintStatus
 };

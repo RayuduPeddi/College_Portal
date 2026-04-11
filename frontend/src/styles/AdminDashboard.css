@@ -70,3 +70,9 @@
 .delete-btn:hover {
   background-color: #b71c1c;
 }
+
+@media (max-width: 768px) {
+  .stats-container {
+    flex-direction: column;
+  }
+}

@@ -89,3 +89,23 @@ input, select {
   padding: 20px;
   font-size: 18px;
 }
+
+/* Responsive Global */
+@media (max-width: 768px) {
+  .dashboard-layout {
+    flex-direction: column;
+  }
+  .table-container {
+    overflow-x: auto;
+  }
+}
+
+/* Micro Animations */
+.card-shadow {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-shadow:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}

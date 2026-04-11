@@ -17,4 +17,8 @@ router.get('/profile', studentController.getProfile);
 router.get('/attendance', studentController.getMyAttendance);
 router.get('/marks', studentController.getMyMarks);
 
+router.get('/notices', studentController.getAllNotices);
+router.post('/complaints', studentController.createComplaint);
+router.get('/complaints', studentController.getMyComplaints);
+
 module.exports = router;

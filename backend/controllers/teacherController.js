@@ -3,6 +3,7 @@ const Attendance = require('../models/Attendance');
 const Marks = require('../models/Marks');
 const Teacher = require('../models/Teacher');
 const User = require('../models/User');
+const Notice = require('../models/Notice');
 
 const getAllStudents = async (req, res) => {
   try {
@@ -15,15 +16,29 @@ const getAllStudents = async (req, res) => {
 
 const markAttendance = async (req, res) => {
   try {
-    const { studentUserId, date, status } = req.body;
-    
+    const { records } = req.body;
+    if (records && Array.isArray(records)) {
+      const attendancePromises = records.map(record => {
+        return new Attendance({
+          studentId: record.studentUserId,
+          teacherId: req.user.id,
+          date: record.date,
+          status: record.status,
+          subject: record.subject || 'General'
+        }).save();
+      });
+      await Promise.all(attendancePromises);
+      return res.json({ success: true, message: 'Bulk attendance saved successfully' });
+    }
+
+    const { studentUserId, date, status, subject } = req.body;
     const newAttendance = new Attendance({
       studentId: studentUserId,
       teacherId: req.user.id,
       date,
-      status
+      status,
+      subject: subject || 'General'
     });
-
     const savedAttendance = await newAttendance.save();
     res.json({ success: true, data: savedAttendance });
   } catch (error) {
@@ -45,8 +60,22 @@ const getMyMarkedAttendance = async (req, res) => {
 
 const addMarks = async (req, res) => {
   try {
-    const { studentUserId, subject, marks, totalMarks } = req.body;
+    const { records } = req.body;
+    if (records && Array.isArray(records)) {
+      const marksPromises = records.map(record => {
+        return new Marks({
+          studentId: record.studentUserId,
+          teacherId: req.user.id,
+          subject: record.subject,
+          marks: record.marks,
+          totalMarks: record.totalMarks || 100
+        }).save();
+      });
+      await Promise.all(marksPromises);
+      return res.json({ success: true, message: 'Bulk marks saved successfully' });
+    }
 
+    const { studentUserId, subject, marks, totalMarks } = req.body;
     const newMarks = new Marks({
       studentId: studentUserId,
       teacherId: req.user.id,
@@ -54,7 +83,6 @@ const addMarks = async (req, res) => {
       marks,
       totalMarks: totalMarks || 100
     });
-
     const savedMarks = await newMarks.save();
     res.json({ success: true, data: savedMarks });
   } catch (error) {
@@ -82,11 +110,21 @@ const getProfile = async (req, res) => {
   }
 };
 
+const getAllNotices = async (req, res) => {
+  try {
+    const notices = await Notice.find().sort({ date: -1 });
+    res.json({ success: true, data: notices });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error fetching notices' });
+  }
+};
+
 module.exports = {
   getAllStudents,
   markAttendance,
   getMyMarkedAttendance,
   addMarks,
   getMyAssignedMarks,
-  getProfile
+  getProfile,
+  getAllNotices
 };

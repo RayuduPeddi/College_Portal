@@ -19,6 +19,10 @@ const attendanceSchema = new mongoose.Schema({
     type: String,
     enum: ['Present', 'Absent'],
     required: true
+  },
+  subject: {
+    type: String,
+    default: 'General'
   }
 });
 

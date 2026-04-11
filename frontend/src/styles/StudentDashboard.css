@@ -69,3 +69,9 @@
   width: 120px;
   color: #4a148c;
 }
+
+@media (max-width: 768px) {
+  .student-stats-container {
+    flex-direction: column;
+  }
+}

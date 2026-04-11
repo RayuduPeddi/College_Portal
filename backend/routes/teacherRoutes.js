@@ -19,5 +19,6 @@ router.get('/attendance', teacherController.getMyMarkedAttendance);
 router.post('/marks', teacherController.addMarks);
 router.get('/marks', teacherController.getMyAssignedMarks);
 router.get('/profile', teacherController.getProfile);
+router.get('/notices', teacherController.getAllNotices);
 
 module.exports = router;
