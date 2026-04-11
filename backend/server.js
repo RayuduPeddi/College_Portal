@@ -5,14 +5,15 @@ require('dotenv').config();
 
 const app = express();
 
-// Middleware
-app.use(cors({
+const corsOptions = {
   origin: "https://rayudu-college-portal.vercel.app",
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
-}));
-app.options("*", cors());
-app.use(cors());
+};
+
+// Middleware
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); 
 app.use(express.json());
 
 // Load Routes
@@ -27,8 +28,8 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/teacher', teacherRoutes);
 app.use('/api/student', studentRoutes);
 
-// Database Connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/collegeportal')
+// Database Connection (MongoDB Atlas)
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('MongoDB connected successfully'))
   .catch(err => console.log('Database connection error:', err));
 
