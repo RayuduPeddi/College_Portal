@@ -1,0 +1,40 @@
+.sidebar {
+  width: 250px;
+  height: 100%;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar.role-admin { background-color: #283593; }
+.sidebar.role-teacher { background-color: #00796b; }
+.sidebar.role-student { background-color: #6a1b9a; }
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+  gap: 5px;
+}
+
+.sidebar-link {
+  background: transparent;
+  color: #e0e0e0;
+  text-align: left;
+  padding: 15px 25px;
+  font-size: 16px;
+  border-radius: 0;
+  transition: background-color 0.2s;
+}
+
+.sidebar-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.sidebar-link.active {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border-left: 5px solid white;
+  font-weight: 600;
+}

@@ -1,0 +1,46 @@
+.outline-teacher {
+  border-top: 5px solid #00695c;
+}
+
+.profile-card {
+  padding: 30px;
+  max-width: 600px;
+}
+
+.profile-card p {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: #444;
+}
+
+.profile-card strong {
+  color: #00695c;
+  display: inline-block;
+  width: 120px;
+}
+
+.teacher-form {
+  padding: 30px;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+.teacher-form label {
+  font-weight: 500;
+  color: #555;
+  margin-top: 15px;
+}
+
+.teacher-form label:first-child {
+  margin-top: 0;
+}
+
+.teacher-btn {
+  margin-top: 25px;
+  padding: 12px;
+  background-color: #00695c;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+}

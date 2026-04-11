@@ -1,0 +1,71 @@
+.outline-student {
+  border-top: 5px solid #4a148c;
+}
+
+.student-stats-container {
+  display: flex;
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.student-stat-card {
+  flex: 1;
+  padding: 30px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.student-stat-card h3 {
+  color: #444;
+  margin-bottom: 20px;
+}
+
+.stat-percentage {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 10px solid #4a148c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.stat-percentage span {
+  font-size: 28px;
+  font-weight: 700;
+  color: #4a148c;
+}
+
+.stat-detail {
+  margin-top: 20px;
+  color: #666;
+  font-size: 14px;
+}
+
+.student-profile-card {
+  flex: 1;
+  padding: 30px;
+}
+
+.student-profile-card h3 {
+  color: #444;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.profile-details p {
+  font-size: 16px;
+  margin-bottom: 15px;
+  color: #555;
+}
+
+.profile-details strong {
+  display: inline-block;
+  width: 120px;
+  color: #4a148c;
+}

@@ -1,0 +1,50 @@
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.admin-login-bg {
+  background-color: #e8eaf6; /* Very light blue */
+}
+
+.login-box {
+  width: 400px;
+  padding: 40px;
+  text-align: center;
+}
+
+.login-box h2 {
+  margin-bottom: 25px;
+  color: #1a237e;
+}
+
+.login-box label {
+  display: block;
+  text-align: left;
+  font-weight: 500;
+  color: #555;
+}
+
+.login-submit-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #1a237e;
+  color: white;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.back-btn {
+  background: none;
+  color: #666;
+  text-decoration: underline;
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.back-btn:hover {
+  filter: none;
+  color: #333;
+}
