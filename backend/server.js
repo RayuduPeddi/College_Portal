@@ -22,8 +22,8 @@ app.use('/api/teacher', teacherRoutes);
 app.use('/api/student', studentRoutes);
 
 // Database Connection
-mongoose.connect('mongodb://127.0.0.1:27017/collegeportal')
-  .then(() => console.log('MongoDB connected to collegeportal'))
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/collegeportal')
+  .then(() => console.log('MongoDB connected successfully'))
   .catch(err => console.log('Database connection error:', err));
 
 // Start Server

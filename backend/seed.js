@@ -7,9 +7,12 @@ const Attendance = require('./models/Attendance');
 const Marks = require('./models/Marks');
 
 // Connect to MongoDB
+require('dotenv').config();
+
 const seedDB = async () => {
   try {
-    await mongoose.connect('mongodb://127.0.0.1:27017/collegeportal');
+    const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/collegeportal';
+    await mongoose.connect(mongoURI);
     console.log('MongoDB connected for seeding');
 
     // Clear existing data

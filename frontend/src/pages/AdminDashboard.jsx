@@ -45,7 +45,7 @@ const AdminDashboard = () => {
   // Fetch all students from backend
   const fetchStudents = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/admin/students', {
+      const res = await fetch('https://college-portal-k8yy.onrender.com/api/admin/students', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const result = await res.json();
@@ -58,7 +58,7 @@ const AdminDashboard = () => {
   // Fetch all teachers from backend
   const fetchTeachers = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/admin/teachers', {
+      const res = await fetch('https://college-portal-k8yy.onrender.com/api/admin/teachers', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const result = await res.json();
@@ -70,7 +70,7 @@ const AdminDashboard = () => {
 
   const fetchNotices = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/admin/notices', {
+      const res = await fetch('https://college-portal-k8yy.onrender.com/api/admin/notices', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const result = await res.json();
@@ -80,7 +80,7 @@ const AdminDashboard = () => {
 
   const fetchComplaints = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/admin/complaints', {
+      const res = await fetch('https://college-portal-k8yy.onrender.com/api/admin/complaints', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const result = await res.json();
@@ -92,7 +92,7 @@ const AdminDashboard = () => {
   const handleAddStudent = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('http://localhost:5000/api/admin/students', {
+      const res = await fetch('https://college-portal-k8yy.onrender.com/api/admin/students', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(newStudent)
@@ -114,7 +114,7 @@ const AdminDashboard = () => {
   const handleDeleteStudent = async (id) => {
     if(!window.confirm('Are you sure you want to delete this student?')) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/students/${id}`, {
+      const res = await fetch(`https://college-portal-k8yy.onrender.com/api/admin/students/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -129,7 +129,7 @@ const AdminDashboard = () => {
   const handleAddTeacher = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('http://localhost:5000/api/admin/teachers', {
+      const res = await fetch('https://college-portal-k8yy.onrender.com/api/admin/teachers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(newTeacher)
@@ -151,7 +151,7 @@ const AdminDashboard = () => {
   const handleDeleteTeacher = async (id) => {
     if(!window.confirm('Are you sure you want to delete this teacher?')) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/teachers/${id}`, {
+      const res = await fetch(`https://college-portal-k8yy.onrender.com/api/admin/teachers/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -167,8 +167,8 @@ const AdminDashboard = () => {
     try {
       setSelectedStudentName(userName);
       const [attendanceRes, marksRes] = await Promise.all([
-        fetch(`http://localhost:5000/api/admin/attendance/${userId}`, { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch(`http://localhost:5000/api/admin/marks/${userId}`, { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch(`https://college-portal-k8yy.onrender.com/api/admin/attendance/${userId}`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`https://college-portal-k8yy.onrender.com/api/admin/marks/${userId}`, { headers: { 'Authorization': `Bearer ${token}` } })
       ]);
       const attResult = await attendanceRes.json();
       const marResult = await marksRes.json();
@@ -185,7 +185,7 @@ const AdminDashboard = () => {
   const handleAddNotice = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('http://localhost:5000/api/admin/notices', {
+      const res = await fetch('https://college-portal-k8yy.onrender.com/api/admin/notices', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(newNotice)
@@ -202,7 +202,7 @@ const AdminDashboard = () => {
   const handleDeleteNotice = async (id) => {
     if(!window.confirm('Delete this notice?')) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/notices/${id}`, {
+      const res = await fetch(`https://college-portal-k8yy.onrender.com/api/admin/notices/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -212,7 +212,7 @@ const AdminDashboard = () => {
 
   const handleUpdateComplaintStatus = async (id, status) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/complaints/${id}/status`, {
+      const res = await fetch(`https://college-portal-k8yy.onrender.com/api/admin/complaints/${id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ status })
