@@ -45,7 +45,7 @@ const AdminDashboard = () => {
   // Fetch all students from backend
   const fetchStudents = async () => {
     try {
-      const res = await fetch('https://college-portal-k8yy.onrender.com/api/admin/students', {
+      const res = await fetch(import.meta.env.VITE_API_URL + '/api/admin/students', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const result = await res.json();
@@ -58,7 +58,7 @@ const AdminDashboard = () => {
   // Fetch all teachers from backend
   const fetchTeachers = async () => {
     try {
-      const res = await fetch('https://college-portal-k8yy.onrender.com/api/admin/teachers', {
+      const res = await fetch(import.meta.env.VITE_API_URL + '/api/admin/teachers', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const result = await res.json();
@@ -70,7 +70,7 @@ const AdminDashboard = () => {
 
   const fetchNotices = async () => {
     try {
-      const res = await fetch('https://college-portal-k8yy.onrender.com/api/admin/notices', {
+      const res = await fetch(import.meta.env.VITE_API_URL + '/api/admin/notices', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const result = await res.json();
@@ -80,7 +80,7 @@ const AdminDashboard = () => {
 
   const fetchComplaints = async () => {
     try {
-      const res = await fetch('https://college-portal-k8yy.onrender.com/api/admin/complaints', {
+      const res = await fetch(import.meta.env.VITE_API_URL + '/api/admin/complaints', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const result = await res.json();
@@ -92,7 +92,7 @@ const AdminDashboard = () => {
   const handleAddStudent = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('https://college-portal-k8yy.onrender.com/api/admin/students', {
+      const res = await fetch(import.meta.env.VITE_API_URL + '/api/admin/students', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(newStudent)
@@ -129,7 +129,7 @@ const AdminDashboard = () => {
   const handleAddTeacher = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('https://college-portal-k8yy.onrender.com/api/admin/teachers', {
+      const res = await fetch(import.meta.env.VITE_API_URL + '/api/admin/teachers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(newTeacher)
@@ -185,7 +185,7 @@ const AdminDashboard = () => {
   const handleAddNotice = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('https://college-portal-k8yy.onrender.com/api/admin/notices', {
+      const res = await fetch(import.meta.env.VITE_API_URL + '/api/admin/notices', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(newNotice)

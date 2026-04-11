@@ -35,7 +35,7 @@ const StudentDashboard = () => {
 
   const fetchProfile = async () => {
     try {
-      const res = await fetch('https://college-portal-k8yy.onrender.com/api/student/profile', { headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await fetch(import.meta.env.VITE_API_URL + '/api/student/profile', { headers: { 'Authorization': `Bearer ${token}` } });
       const result = await res.json();
       if (result.success) setProfile(result.data);
     } catch (err) { console.log(err); }
@@ -43,7 +43,7 @@ const StudentDashboard = () => {
 
   const fetchAttendance = async () => {
     try {
-      const res = await fetch('https://college-portal-k8yy.onrender.com/api/student/attendance', { headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await fetch(import.meta.env.VITE_API_URL + '/api/student/attendance', { headers: { 'Authorization': `Bearer ${token}` } });
       const result = await res.json();
       if (result.success) setAttendance(result.data);
     } catch (err) { console.log(err); }
@@ -51,7 +51,7 @@ const StudentDashboard = () => {
 
   const fetchMarks = async () => {
     try {
-      const res = await fetch('https://college-portal-k8yy.onrender.com/api/student/marks', { headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await fetch(import.meta.env.VITE_API_URL + '/api/student/marks', { headers: { 'Authorization': `Bearer ${token}` } });
       const result = await res.json();
       if (result.success) setMarks(result.data);
     } catch (err) { console.log(err); }
@@ -59,7 +59,7 @@ const StudentDashboard = () => {
 
   const fetchNotices = async () => {
     try {
-      const res = await fetch('https://college-portal-k8yy.onrender.com/api/student/notices', { headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await fetch(import.meta.env.VITE_API_URL + '/api/student/notices', { headers: { 'Authorization': `Bearer ${token}` } });
       const result = await res.json();
       if (result.success) setNotices(result.data);
     } catch (err) { console.log(err); }
@@ -67,7 +67,7 @@ const StudentDashboard = () => {
 
   const fetchComplaints = async () => {
     try {
-      const res = await fetch('https://college-portal-k8yy.onrender.com/api/student/complaints', { headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await fetch(import.meta.env.VITE_API_URL + '/api/student/complaints', { headers: { 'Authorization': `Bearer ${token}` } });
       const result = await res.json();
       if (result.success) setComplaints(result.data);
     } catch (err) { console.log(err); }
@@ -76,7 +76,7 @@ const StudentDashboard = () => {
   const handleAddComplaint = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('https://college-portal-k8yy.onrender.com/api/student/complaints', {
+      const res = await fetch(import.meta.env.VITE_API_URL + '/api/student/complaints', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(newComplaint)

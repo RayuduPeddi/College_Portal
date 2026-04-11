@@ -43,7 +43,7 @@ const TeacherDashboard = () => {
 
   const fetchProfile = async () => {
     try {
-      const res = await fetch('https://college-portal-k8yy.onrender.com/api/teacher/profile', { headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await fetch(import.meta.env.VITE_API_URL + '/api/teacher/profile', { headers: { 'Authorization': `Bearer ${token}` } });
       const result = await res.json();
       if (result.success) {
         setProfile(result.data);
@@ -54,7 +54,7 @@ const TeacherDashboard = () => {
 
   const fetchStudents = async () => {
     try {
-      const res = await fetch('https://college-portal-k8yy.onrender.com/api/teacher/students', { headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await fetch(import.meta.env.VITE_API_URL + '/api/teacher/students', { headers: { 'Authorization': `Bearer ${token}` } });
       const result = await res.json();
       if (result.success) setStudents(result.data);
     } catch (err) { console.log(err); }
@@ -62,7 +62,7 @@ const TeacherDashboard = () => {
 
   const fetchMyAttendance = async () => {
     try {
-      const res = await fetch('https://college-portal-k8yy.onrender.com/api/teacher/attendance', { headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await fetch(import.meta.env.VITE_API_URL + '/api/teacher/attendance', { headers: { 'Authorization': `Bearer ${token}` } });
       const result = await res.json();
       if (result.success) setAttendanceHistory(result.data);
     } catch (err) { console.log(err); }
@@ -70,7 +70,7 @@ const TeacherDashboard = () => {
 
   const fetchMyMarks = async () => {
     try {
-      const res = await fetch('https://college-portal-k8yy.onrender.com/api/teacher/marks', { headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await fetch(import.meta.env.VITE_API_URL + '/api/teacher/marks', { headers: { 'Authorization': `Bearer ${token}` } });
       const result = await res.json();
       if (result.success) setMarksHistory(result.data);
     } catch (err) { console.log(err); }
@@ -78,7 +78,7 @@ const TeacherDashboard = () => {
 
   const fetchNotices = async () => {
     try {
-      const res = await fetch('https://college-portal-k8yy.onrender.com/api/teacher/notices', { headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await fetch(import.meta.env.VITE_API_URL + '/api/teacher/notices', { headers: { 'Authorization': `Bearer ${token}` } });
       const result = await res.json();
       if (result.success) setNotices(result.data);
     } catch (err) { console.log(err); }
@@ -88,7 +88,7 @@ const TeacherDashboard = () => {
   const handleMarkAttendanceRow = async (studentUserId) => {
     const status = attendanceData[studentUserId] === false ? 'Absent' : 'Present'; // Default to Present if not specifically false
     try {
-      const res = await fetch('https://college-portal-k8yy.onrender.com/api/teacher/attendance', {
+      const res = await fetch(import.meta.env.VITE_API_URL + '/api/teacher/attendance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ studentUserId, date: attendanceDate, status })
@@ -110,7 +110,7 @@ const TeacherDashboard = () => {
       return;
     }
     try {
-      const res = await fetch('https://college-portal-k8yy.onrender.com/api/teacher/marks', {
+      const res = await fetch(import.meta.env.VITE_API_URL + '/api/teacher/marks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ studentUserId, subject: marksSubject, marks: marksVal, totalMarks: 100 })
