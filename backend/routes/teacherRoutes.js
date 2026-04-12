@@ -16,8 +16,10 @@ router.use(teacherOnly);
 router.get('/students', teacherController.getAllStudents);
 router.post('/attendance', teacherController.markAttendance);
 router.get('/attendance', teacherController.getMyMarkedAttendance);
+router.patch('/attendance/:id', teacherController.updateAttendance);
 router.post('/marks', teacherController.addMarks);
 router.get('/marks', teacherController.getMyAssignedMarks);
+router.patch('/marks/:id', teacherController.updateMarks);
 router.get('/profile', teacherController.getProfile);
 router.get('/notices', teacherController.getAllNotices);
 

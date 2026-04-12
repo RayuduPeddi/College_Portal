@@ -20,9 +20,18 @@ const addStudent = async (req, res) => {
   try {
     const { name, email, password, rollNo, department } = req.body;
     
+    if (!name || !email || !password || !rollNo || !department) {
+      return res.status(400).json({ success: false, message: 'All fields are required (Name, Email, Password, Roll No, Department)' });
+    }
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ success: false, message: 'Email already exists' });
+    }
+
+    const existingRoll = await Student.findOne({ rollNo });
+    if (existingRoll) {
+      return res.status(400).json({ success: false, message: 'Roll Number already exists in the system' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -80,6 +89,10 @@ const addTeacher = async (req, res) => {
   try {
     const { name, email, password, subject, department } = req.body;
     
+    if (!name || !email || !password || !subject || !department) {
+      return res.status(400).json({ success: false, message: 'All fields are required (Name, Email, Password, Subject, Department)' });
+    }
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ success: false, message: 'Email already exists' });

@@ -18,6 +18,21 @@ const markAttendance = async (req, res) => {
   try {
     const { records } = req.body;
     if (records && Array.isArray(records)) {
+      for (const record of records) {
+        const startOfDay = new Date(record.date);
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(record.date);
+        endOfDay.setHours(23, 59, 59, 999);
+        const existing = await Attendance.findOne({
+          studentId: record.studentUserId,
+          subject: record.subject || 'General',
+          date: { $gte: startOfDay, $lte: endOfDay }
+        });
+        if (existing) {
+          return res.status(400).json({ success: false, message: `Attendance already marked for student ID: ${record.studentUserId} on this date` });
+        }
+      }
+
       const attendancePromises = records.map(record => {
         return new Attendance({
           studentId: record.studentUserId,
@@ -32,6 +47,20 @@ const markAttendance = async (req, res) => {
     }
 
     const { studentUserId, date, status, subject } = req.body;
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+    const existing = await Attendance.findOne({
+      studentId: studentUserId,
+      subject: subject || 'General',
+      date: { $gte: startOfDay, $lte: endOfDay }
+    });
+    
+    if (existing) {
+      return res.status(400).json({ success: false, message: 'Attendance already marked for this subject and date' });
+    }
+
     const newAttendance = new Attendance({
       studentId: studentUserId,
       teacherId: req.user.id,
@@ -62,6 +91,16 @@ const addMarks = async (req, res) => {
   try {
     const { records } = req.body;
     if (records && Array.isArray(records)) {
+      for (const record of records) {
+        const existing = await Marks.findOne({
+          studentId: record.studentUserId,
+          subject: record.subject
+        });
+        if (existing) {
+          return res.status(400).json({ success: false, message: `Marks already exist for student ID: ${record.studentUserId} in ${record.subject}` });
+        }
+      }
+
       const marksPromises = records.map(record => {
         return new Marks({
           studentId: record.studentUserId,
@@ -76,6 +115,15 @@ const addMarks = async (req, res) => {
     }
 
     const { studentUserId, subject, marks, totalMarks } = req.body;
+    const existing = await Marks.findOne({
+      studentId: studentUserId,
+      subject: subject
+    });
+
+    if (existing) {
+      return res.status(400).json({ success: false, message: `Marks already exist for this subject` });
+    }
+
     const newMarks = new Marks({
       studentId: studentUserId,
       teacherId: req.user.id,
@@ -119,12 +167,44 @@ const getAllNotices = async (req, res) => {
   }
 };
 
+const updateAttendance = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const attendance = await Attendance.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+    if (!attendance) return res.status(404).json({ success: false, message: 'Attendance record not found or unauthorized' });
+    res.json({ success: true, data: attendance });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error updating attendance' });
+  }
+};
+
+const updateMarks = async (req, res) => {
+  try {
+    const { marks } = req.body;
+    const marksRecord = await Marks.findByIdAndUpdate(
+      req.params.id,
+      { marks },
+      { new: true }
+    );
+    if (!marksRecord) return res.status(404).json({ success: false, message: 'Marks record not found or unauthorized' });
+    res.json({ success: true, data: marksRecord });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error updating marks' });
+  }
+};
+
 module.exports = {
   getAllStudents,
   markAttendance,
   getMyMarkedAttendance,
+  updateAttendance,
   addMarks,
   getMyAssignedMarks,
+  updateMarks,
   getProfile,
   getAllNotices
 };
