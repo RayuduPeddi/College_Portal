@@ -114,7 +114,7 @@ const AdminDashboard = () => {
   const handleDeleteStudent = async (id) => {
     if(!window.confirm('Are you sure you want to delete this student?')) return;
     try {
-      const res = await fetch(`https://college-portal-k8yy.onrender.com/api/admin/students/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/students/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -151,7 +151,7 @@ const AdminDashboard = () => {
   const handleDeleteTeacher = async (id) => {
     if(!window.confirm('Are you sure you want to delete this teacher?')) return;
     try {
-      const res = await fetch(`https://college-portal-k8yy.onrender.com/api/admin/teachers/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/teachers/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -167,8 +167,8 @@ const AdminDashboard = () => {
     try {
       setSelectedStudentName(userName);
       const [attendanceRes, marksRes] = await Promise.all([
-        fetch(`https://college-portal-k8yy.onrender.com/api/admin/attendance/${userId}`, { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch(`https://college-portal-k8yy.onrender.com/api/admin/marks/${userId}`, { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch(`${import.meta.env.VITE_API_URL}/api/admin/attendance/${userId}`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`${import.meta.env.VITE_API_URL}/api/admin/marks/${userId}`, { headers: { 'Authorization': `Bearer ${token}` } })
       ]);
       const attResult = await attendanceRes.json();
       const marResult = await marksRes.json();
@@ -202,7 +202,7 @@ const AdminDashboard = () => {
   const handleDeleteNotice = async (id) => {
     if(!window.confirm('Delete this notice?')) return;
     try {
-      const res = await fetch(`https://college-portal-k8yy.onrender.com/api/admin/notices/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/notices/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -212,7 +212,7 @@ const AdminDashboard = () => {
 
   const handleUpdateComplaintStatus = async (id, status) => {
     try {
-      const res = await fetch(`https://college-portal-k8yy.onrender.com/api/admin/complaints/${id}/status`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/complaints/${id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ status })

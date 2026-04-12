@@ -96,7 +96,39 @@ input, select {
     flex-direction: column;
   }
   .table-container {
-    overflow-x: auto;
+    overflow-x: hidden;
+    padding: 10px 0;
+  }
+  .table-container table, 
+  .table-container thead, 
+  .table-container tbody, 
+  .table-container th, 
+  .table-container td, 
+  .table-container tr { 
+    display: block; 
+    width: 100%;
+  }
+  .table-container thead tr { 
+    display: none;
+  }
+  .table-container tr { 
+    border: 1px solid #eee;
+    margin-bottom: 15px; 
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  }
+  .table-container td { 
+    border: none;
+    border-bottom: 1px solid #f9f9f9; 
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .table-container td:last-child {
+    border-bottom: none;
   }
 }
 

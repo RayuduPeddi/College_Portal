@@ -47,20 +47,21 @@
   }
 
   .sidebar-menu {
-    flex-direction: row;
-    overflow-x: auto;
+    flex-direction: column;
+    overflow-x: hidden;
     padding: 10px 0;
   }
   
   .sidebar-link {
-    white-space: nowrap;
-    padding: 10px 15px;
-    border-left: none;
-    border-bottom: 3px solid transparent;
+    white-space: normal;
+    text-align: left;
+    padding: 12px 20px;
+    border-left: 5px solid transparent;
+    border-bottom: none;
   }
   
   .sidebar-link.active {
-    border-left: none;
-    border-bottom: 3px solid white;
+    border-left: 5px solid white;
+    border-bottom: none;
   }
 }

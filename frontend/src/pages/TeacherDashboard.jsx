@@ -19,8 +19,10 @@ const TeacherDashboard = () => {
   const [attendanceDate, setAttendanceDate] = useState(new Date().toISOString().split('T')[0]);
   const [attendanceData, setAttendanceData] = useState({});
 
-  const [marksSubject, setMarksSubject] = useState('');
   const [marksData, setMarksData] = useState({});
+
+  const [editAttendanceState, setEditAttendanceState] = useState({});
+  const [editMarksState, setEditMarksState] = useState({});
 
   // Sidebar Menu Configuration
   const menuItems = [
@@ -47,7 +49,6 @@ const TeacherDashboard = () => {
       const result = await res.json();
       if (result.success) {
         setProfile(result.data);
-        if (result.data.subject) setMarksSubject(result.data.subject);
       }
     } catch (err) { console.log(err); }
   };
@@ -84,20 +85,31 @@ const TeacherDashboard = () => {
     } catch (err) { console.log(err); }
   };
 
-  // Submit attendance row
-  const handleMarkAttendanceRow = async (studentUserId) => {
-    const status = attendanceData[studentUserId] === false ? 'Absent' : 'Present'; // Default to Present if not specifically false
+  // Submit bulk attendance
+  const handleMarkBulkAttendance = async () => {
+    const records = students.map(s => {
+      const studentUserId = s.userId?._id;
+      const status = attendanceData[studentUserId] === false ? 'Absent' : 'Present';
+      return {
+        studentUserId,
+        date: attendanceDate,
+        status,
+        subject: profile.subject
+      };
+    });
+
     try {
       const res = await fetch(import.meta.env.VITE_API_URL + '/api/teacher/attendance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ studentUserId, date: attendanceDate, status })
+        body: JSON.stringify({ records })
       });
       const result = await res.json();
       if (result.success) {
-        alert('Attendance marked successfully!');
+        alert('All attendance marked successfully!');
+        fetchMyAttendance(); // refresh the authored history
       } else {
-        alert('Failed to mark attendance.');
+        alert(result.message || 'Failed to mark attendance.');
       }
     } catch (err) { console.log(err); }
   };
@@ -113,14 +125,48 @@ const TeacherDashboard = () => {
       const res = await fetch(import.meta.env.VITE_API_URL + '/api/teacher/marks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ studentUserId, subject: marksSubject, marks: marksVal, totalMarks: 100 })
+        body: JSON.stringify({ studentUserId, subject: profile.subject, marks: marksVal, totalMarks: 100 })
       });
       const result = await res.json();
       if (result.success) {
         alert('Marks added successfully!');
         setMarksData({ ...marksData, [studentUserId]: '' });
       } else {
-        alert('Failed to add marks.');
+        alert(result.message || 'Failed to add marks.');
+      }
+    } catch (err) { console.log(err); }
+  };
+
+  const handleEditAttendanceStatus = async (id, status) => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/teacher/attendance/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ status })
+      });
+      const result = await res.json();
+      if (result.success) {
+        alert('Attendance updated successfully!');
+        fetchMyAttendance(); // refresh
+      } else {
+        alert('Failed to edit attendance: ' + result.message);
+      }
+    } catch (err) { console.log(err); }
+  };
+
+  const handleEditMarks = async (id, marks) => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/teacher/marks/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ marks })
+      });
+      const result = await res.json();
+      if (result.success) {
+        alert('Marks updated successfully!');
+        fetchMyMarks(); // refresh
+      } else {
+        alert('Failed to edit marks: ' + result.message);
       }
     } catch (err) { console.log(err); }
   };
@@ -183,7 +229,7 @@ const TeacherDashboard = () => {
               <div className="table-container card-shadow outline-teacher">
                 <table>
                   <thead>
-                    <tr><th>Student Name</th><th>Roll No</th><th>Attendance (Present)</th><th>Action</th></tr>
+                    <tr><th>Student Name</th><th>Roll No</th><th>Attendance (Present)</th></tr>
                   </thead>
                   <tbody>
                     {students.map(s => (
@@ -194,17 +240,19 @@ const TeacherDashboard = () => {
                           <input
                             type="checkbox"
                             style={{ width: '20px', height: '20px', margin: '0' }}
-                            checked={attendanceData[s.userId?._id] !== false} // True by default
+                            checked={attendanceData[s.userId?._id] !== false} 
                             onChange={e => setAttendanceData({ ...attendanceData, [s.userId?._id]: e.target.checked })}
                           />
-                        </td>
-                        <td>
-                          <button onClick={() => handleMarkAttendanceRow(s.userId?._id)} className="teacher-btn" style={{ padding: '6px 12px', minWidth: 'auto' }}>Save</button>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+              </div>
+              <div style={{ marginTop: '20px', textAlign: 'right' }}>
+                <button onClick={handleMarkBulkAttendance} className="primary-btn teacher-btn" style={{ fontSize: '16px', padding: '10px 30px' }}>
+                  Save All Attendance
+                </button>
               </div>
             </div>
           )}
@@ -216,7 +264,7 @@ const TeacherDashboard = () => {
               <strong style={{ fontSize: '16px', color: '#555', display: 'block', marginBottom: '10px' }}>Subject: {profile.subject}</strong>
               <div className="table-container card-shadow outline-teacher">
                 <table>
-                  <thead><tr><th>Date</th><th>Student Name</th><th>Student Email</th><th>Status</th></tr></thead>
+                  <thead><tr><th>Date</th><th>Student Name</th><th>Student Email</th><th>Status</th><th>Edit Action</th></tr></thead>
                   <tbody>
                     {attendanceHistory.map(a => (
                       <tr key={a._id}>
@@ -224,6 +272,23 @@ const TeacherDashboard = () => {
                         <td>{a.studentId?.name}</td>
                         <td>{a.studentId?.email}</td>
                         <td style={{ color: a.status === 'Present' ? 'green' : 'red', fontWeight: '500' }}>{a.status}</td>
+                        <td>
+                          <select 
+                            defaultValue={a.status} 
+                            onChange={(e) => setEditAttendanceState({...editAttendanceState, [a._id]: e.target.value})}
+                            style={{ margin: 0, width: '120px', padding: '5px', display: 'inline-block' }}
+                          >
+                            <option value="Present">Present</option>
+                            <option value="Absent">Absent</option>
+                          </select>
+                          <button 
+                            className="teacher-btn" 
+                            style={{ padding: '6px 12px', marginLeft: '10px', minWidth: 'auto', display: 'inline-block' }}
+                            onClick={() => handleEditAttendanceStatus(a._id, editAttendanceState[a._id] || a.status)}
+                          >
+                            Save
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -237,8 +302,7 @@ const TeacherDashboard = () => {
             <div className="tab-section">
               <h2>Add Student Marks</h2>
               <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '15px' }}>
-                <strong style={{ fontSize: '18px', color: '#00796b' }}>Subject:</strong>
-                <input type="text" value={marksSubject} onChange={e => setMarksSubject(e.target.value)} style={{ width: '200px', margin: 0 }} />
+                <strong style={{ fontSize: '18px', color: '#00796b' }}>Subject: {profile.subject}</strong>
               </div>
               <div className="table-container card-shadow outline-teacher">
                 <table>
@@ -277,13 +341,29 @@ const TeacherDashboard = () => {
               <strong style={{ fontSize: '16px', color: '#555', display: 'block', marginBottom: '10px' }}>Subject: {profile.subject}</strong>
               <div className="table-container card-shadow outline-teacher">
                 <table>
-                  <thead><tr><th>Student Name</th><th>Subject</th><th>Marks</th></tr></thead>
+                  <thead><tr><th>Student Name</th><th>Subject</th><th>Total Marks</th><th>Assigned Marks</th><th>Edit Marks</th></tr></thead>
                   <tbody>
                     {marksHistory.map(m => (
                       <tr key={m._id}>
                         <td>{m.studentId?.name}</td>
                         <td>{m.subject}</td>
-                        <td>{m.marks} / {m.totalMarks}</td>
+                        <td>{m.totalMarks}</td>
+                        <td style={{ fontWeight: 'bold', color: '#00796b' }}>{m.marks}</td>
+                        <td>
+                          <input 
+                            type="number" 
+                            defaultValue={m.marks} 
+                            onChange={(e) => setEditMarksState({...editMarksState, [m._id]: e.target.value})}
+                            style={{ width: '80px', margin: 0, padding: '5px', display: 'inline-block' }}
+                          />
+                          <button 
+                            className="teacher-btn" 
+                            style={{ padding: '6px 12px', marginLeft: '10px', minWidth: 'auto', display: 'inline-block' }}
+                            onClick={() => handleEditMarks(m._id, editMarksState[m._id] || m.marks)}
+                          >
+                            Save
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
