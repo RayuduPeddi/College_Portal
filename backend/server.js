@@ -6,7 +6,7 @@ require('dotenv').config();
 const app = express();
 
 const corsOptions = {
-  origin: "https://rayudu-college-portal.vercel.app",
+  origin: "https://rayudu-collegeportal.vercel.app",
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 };
