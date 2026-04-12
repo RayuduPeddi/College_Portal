@@ -7,7 +7,7 @@ const app = express();
 
 const corsOptions = {
   origin: "https://rayudu-collegeportal.vercel.app",
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   credentials: true
 };
 
