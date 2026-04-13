@@ -1,16 +1,16 @@
 Sample Credentials:
 
 Admin:
-admin@gmail.com
-admin123
+gmail:admin@gmail.com
+password:admin123
 
 Teacher:
-teacher1@gmail.com
-teacher123
+gmail:teacher1@gmail.com
+password:teacher123
 
 Student:
-rayudu@gmail.com
-rayudu
+gmail:rayudu@gmail.com
+password:rayudu
 
 
 
