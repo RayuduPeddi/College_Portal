@@ -1,3 +1,26 @@
+Sample Credentials:
+
+Admin:
+admin@gmail.com
+admin123
+
+Teacher:
+teacher1@gmail.com
+teacher123
+
+Student:
+rayudu@gmail.com
+rayudu
+
+
+
+
+
+
+
+
+
+
 git commit -m "first commit"
 # College Student Portal (MERN Stack)
 
