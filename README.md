@@ -1,3 +1,5 @@
+Deployed Project Link:rayudu-collegeportal.vercel.app
+
 Sample Credentials:
 
 Admin:
