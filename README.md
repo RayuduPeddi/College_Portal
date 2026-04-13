@@ -23,7 +23,6 @@ password:rayudu
 
 
 
-git commit -m "first commit"
 # College Student Portal (MERN Stack)
 
 A beginner-friendly College Student Portal built using the MERN stack (MongoDB, Express.js, React, Node.js). This project implements simple, readable, and easy-to-understand patterns without using advanced abstract concepts.
