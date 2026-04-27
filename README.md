@@ -28,7 +28,7 @@ password:rayudu
 A beginner-friendly College Student Portal built using the MERN stack (MongoDB, Express.js, React, Node.js). This project implements simple, readable, and easy-to-understand patterns without using advanced abstract concepts.
 
 ## Tech Stack
-- **Frontend**: React (Vite), Plain CSS (No Tailwind, No Bootstrap)
+- **Frontend**: React (Vite)
 - **Backend**: Node.js, Express.js
 - **Database**: Local MongoDB (Mongoose)
 - **Auth**: JWT stored in localStorage
