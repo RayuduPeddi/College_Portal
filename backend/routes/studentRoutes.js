@@ -21,4 +21,8 @@ router.get('/notices', studentController.getAllNotices);
 router.post('/complaints', studentController.createComplaint);
 router.get('/complaints', studentController.getMyComplaints);
 
+// Study Materials route
+router.get('/materials', studentController.getMaterials);
+
 module.exports = router;
+

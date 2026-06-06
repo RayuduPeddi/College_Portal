@@ -8,3 +8,6 @@ frontend/.eslintcache
 
 # Backend artifacts
 backend/node_modules/
+backend/uploads/
+backend/test*.js
+backend/cleanupDuplicates.js

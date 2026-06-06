@@ -18,7 +18,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['admin', 'teacher', 'student'],
     required: true
+  },
+  profilePicture: {
+    type: String
   }
 });
 
 module.exports = mongoose.model('User', userSchema);
+

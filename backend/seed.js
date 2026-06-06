@@ -5,6 +5,7 @@ const Student = require('./models/Student');
 const Teacher = require('./models/Teacher');
 const Attendance = require('./models/Attendance');
 const Marks = require('./models/Marks');
+const Material = require('./models/Material');
 
 // Connect to MongoDB
 require('dotenv').config();
@@ -16,11 +17,12 @@ const seedDB = async () => {
     console.log('MongoDB connected for seeding');
 
     // Clear existing data
-    await User.deleteMany({});
+    await User.deleteMany({}); 
     await Student.deleteMany({});
     await Teacher.deleteMany({});
     await Attendance.deleteMany({});
     await Marks.deleteMany({});
+    await Material.deleteMany({});
     console.log('Database cleared');
 
     const hashedAdminPassword = await bcrypt.hash('admin123', 10);
@@ -29,7 +31,7 @@ const seedDB = async () => {
 
     // 1. Create Admin
     const admin = new User({
-      name: 'Super Admin',
+      name: 'PEDDI RAYUDU',
       email: 'admin@gmail.com',
       password: hashedAdminPassword,
       role: 'admin'
@@ -37,20 +39,22 @@ const seedDB = async () => {
     await admin.save();
 
     // 2. Create Teachers
-    const teacher1 = new User({ name: 'teacher1', email: 'teacher1@gmail.com', password: hashedTeacherPassword, role: 'teacher' });
+    const teacher1 = new User({ name: 'Dr.Santhosh Kumar', email: 'teacher1@gmail.com', password: hashedTeacherPassword, role: 'teacher' });
     const savedTeacher1 = await teacher1.save();
-    await new Teacher({ userId: savedTeacher1._id, subject: 'Mathematics', department: 'Science' }).save();
+    await new Teacher({ userId: savedTeacher1._id, subject: 'Artificial Intelligence', department: 'CSE' }).save();
 
-    const teacher2 = new User({ name: 'teacher2', email: 'teacher2@gmail.com', password: hashedTeacherPassword, role: 'teacher' });
+    const teacher2 = new User({ name: 'Dr.Tirupathi Reddy', email: 'teacher2@gmail.com', password: hashedTeacherPassword, role: 'teacher' });
     const savedTeacher2 = await teacher2.save();
-    await new Teacher({ userId: savedTeacher2._id, subject: 'Physics', department: 'Science' }).save();
+    await new Teacher({ userId: savedTeacher2._id, subject: 'Data Structures & Algorithms', department: 'CSE' }).save();
 
     // 3. Create Students
-    for(let i = 1; i <= 3; i++) {
-      const studentUser = new User({ name: `Student ${i}`, email: `student${i}@college.com`, password: hashedStudentPassword, role: 'student' });
-      const savedStudent = await studentUser.save();
-      await new Student({ userId: savedStudent._id, rollNo: `23VD1A05${i}`, department: 'Computer Science And Engineering' }).save();
-    }
+      const studentUser1 = new User({ name: `Aravind`, email: `student1@gmail.com`, password: hashedStudentPassword, role: 'student' });
+      const savedStudent1 = await studentUser1.save();
+      await new Student({ userId: savedStudent1._id, rollNo: `23VD1A6613`, department: 'CSE(AI&ML)' }).save();
+
+      const studentUser2 = new User({ name: `Chandu`, email: `student2@college.com`, password: hashedStudentPassword, role: 'student' });
+      const savedStudent2 = await studentUser2.save();
+      await new Student({ userId: savedStudent2._id, rollNo: `23VD1A0512`, department: 'CSE' }).save();
 
     console.log('Seeding completed successfully!');
     process.exit();

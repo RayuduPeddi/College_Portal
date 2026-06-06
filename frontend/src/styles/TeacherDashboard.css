@@ -1,5 +1,5 @@
 .outline-teacher {
-  border-top: 5px solid #00695c;
+  border-top: 5px solid var(--primary-color);
 }
 
 .profile-card {
@@ -14,7 +14,7 @@
 }
 
 .profile-card strong {
-  color: #00695c;
+  color: var(--primary-color);
   display: inline-block;
   width: 120px;
 }
@@ -39,7 +39,7 @@
 .teacher-btn {
   margin-top: 25px;
   padding: 12px;
-  background-color: #00695c;
+  background-color: var(--primary-color);
   color: white;
   font-size: 16px;
   font-weight: 500;

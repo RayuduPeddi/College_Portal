@@ -5,7 +5,9 @@ const Attendance = require('../models/Attendance');
 const Marks = require('../models/Marks');
 const Notice = require('../models/Notice');
 const Complaint = require('../models/Complaint');
+const Material = require('../models/Material');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 const getAllStudents = async (req, res) => {
   try {
@@ -18,10 +20,10 @@ const getAllStudents = async (req, res) => {
 
 const addStudent = async (req, res) => {
   try {
-    const { name, email, password, rollNo, department } = req.body;
-    
-    if (!name || !email || !password || !rollNo || !department) {
-      return res.status(400).json({ success: false, message: 'All fields are required (Name, Email, Password, Roll No, Department)' });
+    const { name, email, rollNo, department } = req.body;
+
+    if (!name || !email || !rollNo || !department) {
+      return res.status(400).json({ success: false, message: 'All fields are required (Name, Email, Roll No, Department)' });
     }
 
     const existingUser = await User.findOne({ email });
@@ -34,7 +36,9 @@ const addStudent = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Roll Number already exists in the system' });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Generate a temporary random password server-side — admin cannot choose the password
+    const tempPassword = crypto.randomBytes(8).toString('hex');
+    const hashedPassword = await bcrypt.hash(tempPassword, 10);
 
     const newUser = new User({
       name,
@@ -51,6 +55,7 @@ const addStudent = async (req, res) => {
     });
     const savedStudent = await newStudent.save();
 
+    // Note: we do not return the temporary password in API response for security.
     res.json({ success: true, data: savedStudent });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Error adding student' });
@@ -87,10 +92,10 @@ const getAllTeachers = async (req, res) => {
 
 const addTeacher = async (req, res) => {
   try {
-    const { name, email, password, subject, department } = req.body;
-    
-    if (!name || !email || !password || !subject || !department) {
-      return res.status(400).json({ success: false, message: 'All fields are required (Name, Email, Password, Subject, Department)' });
+    const { name, email, subject, department } = req.body;
+
+    if (!name || !email || !subject || !department) {
+      return res.status(400).json({ success: false, message: 'All fields are required (Name, Email, Subject, Department)' });
     }
 
     const existingUser = await User.findOne({ email });
@@ -98,7 +103,9 @@ const addTeacher = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Email already exists' });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Generate a temporary random password server-side — admin cannot choose the password
+    const tempPassword = crypto.randomBytes(8).toString('hex');
+    const hashedPassword = await bcrypt.hash(tempPassword, 10);
 
     const newUser = new User({
       name,
@@ -209,14 +216,144 @@ const updateComplaintStatus = async (req, res) => {
   }
 };
 
+// Study materials handlers
+const uploadMaterial = async (req, res) => {
+  try {
+    const { title, description, subject } = req.body;
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No file uploaded' });
+    }
+    if (!title || !subject) {
+      return res.status(400).json({ success: false, message: 'Title and Subject are required' });
+    }
+    const newMaterial = new Material({
+      title,
+      description,
+      subject,
+      fileUrl: `/uploads/${req.file.filename}`,
+      fileName: req.file.originalname,
+      uploadedBy: req.user.id
+    });
+    await newMaterial.save();
+    res.json({ success: true, data: newMaterial });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Error uploading study material' });
+  }
+};
+
+const getAllMaterials = async (req, res) => {
+  try {
+    const materials = await Material.find().populate('uploadedBy', 'name email role').sort({ date: -1 });
+    res.json({ success: true, data: materials });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error fetching materials' });
+  }
+};
+
+const deleteMaterial = async (req, res) => {
+  try {
+    const material = await Material.findById(req.params.id);
+    if (!material) {
+      return res.status(404).json({ success: false, message: 'Material not found' });
+    }
+    await Material.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: 'Material deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error deleting material' });
+  }
+};
+
+const updateStudent = async (req, res) => {
+  try {
+    const { name, email, rollNo, department } = req.body;
+    
+    if (!name || !email || !rollNo || !department) {
+      return res.status(400).json({ success: false, message: 'All fields are required (Name, Email, Roll No, Department)' });
+    }
+
+    const student = await Student.findById(req.params.id);
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student not found' });
+    }
+
+    // Check if email is in use by another user
+    const existingEmail = await User.findOne({ email, _id: { $ne: student.userId } });
+    if (existingEmail) {
+      return res.status(400).json({ success: false, message: 'Email is already taken by another account' });
+    }
+
+    // Check if roll number is in use by another student
+    const existingRoll = await Student.findOne({ rollNo, _id: { $ne: req.params.id } });
+    if (existingRoll) {
+      return res.status(400).json({ success: false, message: 'Roll Number already exists' });
+    }
+
+    // Prepare User model updates (name & email) - do NOT allow admin to change password here
+    const userUpdates = { name, email };
+    await User.findByIdAndUpdate(student.userId, userUpdates);
+
+    // Update Student model
+    student.rollNo = rollNo;
+    student.department = department;
+    await student.save();
+
+    const updatedStudent = await Student.findById(req.params.id).populate('userId', 'name email').exec();
+    res.json({ success: true, data: updatedStudent });
+  } catch (error) {
+    console.error('Error updating student:', error);
+    res.status(500).json({ success: false, message: 'Error updating student' });
+  }
+};
+
+const updateTeacher = async (req, res) => {
+  try {
+    const { name, email, subject, department } = req.body;
+
+    if (!name || !email || !subject || !department) {
+      return res.status(400).json({ success: false, message: 'All fields are required (Name, Email, Subject, Department)' });
+    }
+
+    const teacher = await Teacher.findById(req.params.id);
+    if (!teacher) {
+      return res.status(404).json({ success: false, message: 'Teacher not found' });
+    }
+
+    // Check if email is in use by another user
+    const existingEmail = await User.findOne({ email, _id: { $ne: teacher.userId } });
+    if (existingEmail) {
+      return res.status(400).json({ success: false, message: 'Email is already taken by another account' });
+    }
+
+    // Prepare User model updates (name & email) - do NOT allow admin to change password here
+    const userUpdates = { name, email };
+    await User.findByIdAndUpdate(teacher.userId, userUpdates);
+
+    // Update Teacher model
+    teacher.subject = subject;
+    teacher.department = department;
+    await teacher.save();
+
+    const updatedTeacher = await Teacher.findById(req.params.id).populate('userId', 'name email').exec();
+    res.json({ success: true, data: updatedTeacher });
+  } catch (error) {
+    console.error('Error updating teacher:', error);
+    res.status(500).json({ success: false, message: 'Error updating teacher' });
+  }
+};
+
 module.exports = {
   getAllStudents,
   addStudent,
   deleteStudent,
+  updateStudent,
   getAllTeachers,
   addTeacher,
   deleteTeacher,
+  updateTeacher,
   getStudentAttendance, getStudentMarks,
   getAllNotices, createNotice, deleteNotice,
-  getAllComplaints, updateComplaintStatus
+  getAllComplaints, updateComplaintStatus,
+  uploadMaterial, getAllMaterials, deleteMaterial
 };
+

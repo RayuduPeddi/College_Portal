@@ -6,8 +6,8 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   const userString = localStorage.getItem('user');
 
   if (!token || !userString) {
-    // If not logged in, redirect to login selection page
-    return <Navigate to="/" replace />;
+    // If not logged in, redirect to unified login page
+    return <Navigate to="/login" replace />;
   }
 
   const user = JSON.parse(userString);

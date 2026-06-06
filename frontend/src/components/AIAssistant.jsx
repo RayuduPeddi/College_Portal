@@ -1,0 +1,287 @@
+import { useState, useEffect, useRef } from 'react';
+import '../styles/AIAssistant.css';
+
+const AIAssistant = () => {
+  const [messages, setMessages] = useState([
+    {
+      id: 'welcome',
+      sender: 'ai',
+      text: 'Hello! I am **CampusConnet AI**, your academic and portal assistant. How can I help you today?',
+      createdAt: new Date()
+    }
+  ]);
+  const [inputText, setInputText] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const [apiKey, setApiKey] = useState(localStorage.getItem('gemini_api_key') || '');
+  const messagesEndRef = useRef(null);
+
+  const token = localStorage.getItem('token');
+
+  // Suggestions depending on the user's role
+  const suggestions = [
+    'Draft a notice about exams',
+    'Write an email asking for leave',
+    'Create a study schedule',
+    'Explain portal features'
+  ];
+
+  // Auto scroll to bottom
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isTyping]);
+
+  // Simulates a typewriter typing effect for a response string
+  const typeMessage = (fullText, messageId) => {
+    setIsTyping(false);
+    
+    // Add an empty AI message that we will populate
+    const newMsg = {
+      id: messageId,
+      sender: 'ai',
+      text: '',
+      createdAt: new Date()
+    };
+    setMessages((prev) => [...prev, newMsg]);
+
+    const words = fullText.split(' ');
+    let currentWordIdx = 0;
+    let currentText = '';
+
+    const interval = setInterval(() => {
+      if (currentWordIdx < words.length) {
+        currentText += (currentWordIdx === 0 ? '' : ' ') + words[currentWordIdx];
+        setMessages((prev) =>
+          prev.map((m) => (m.id === messageId ? { ...m, text: currentText } : m))
+        );
+        currentWordIdx++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 45); // Speed of typing words
+  };
+
+  const handleSend = async (textToSend) => {
+    if (!textToSend || !textToSend.trim()) return;
+
+    // Add User Message
+    const userMsg = {
+      id: Date.now().toString(),
+      sender: 'user',
+      text: textToSend,
+      createdAt: new Date()
+    };
+    setMessages((prev) => [...prev, userMsg]);
+    setInputText('');
+    setIsTyping(true);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/ai/query`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ prompt: textToSend, apiKey })
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        // Stream typing effect for AI answer
+        typeMessage(result.text, 'ai-' + Date.now().toString());
+      } else {
+        setIsTyping(false);
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: 'err-' + Date.now().toString(),
+            sender: 'ai',
+            text: '⚠️ Sorry, I encountered an issue fetching the response. Please try again.',
+            createdAt: new Date()
+          }
+        ]);
+      }
+    } catch (err) {
+      console.error(err);
+      setIsTyping(false);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: 'err-' + Date.now().toString(),
+          sender: 'ai',
+          text: '⚠️ Network error. Please verify the backend server is running and try again.',
+          createdAt: new Date()
+        }
+      ]);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    handleSend(inputText);
+  };
+
+  // Render text containing custom markdown formats like bold and codeblocks
+  const renderFormattedText = (text) => {
+    if (!text) return '';
+
+    // Simple markdown-to-HTML helper for UI
+    const parts = [];
+    const lines = text.split('\n');
+
+    let isCodeBlock = false;
+    let codeBlockContent = [];
+
+    lines.forEach((line, idx) => {
+      if (line.trim().startsWith('```')) {
+        if (isCodeBlock) {
+          // Close code block
+          parts.push(
+            <pre key={`code-${idx}`}>
+              <code>{codeBlockContent.join('\n')}</code>
+            </pre>
+          );
+          codeBlockContent = [];
+          isCodeBlock = false;
+        } else {
+          isCodeBlock = true;
+        }
+        return;
+      }
+
+      if (isCodeBlock) {
+        codeBlockContent.push(line);
+        return;
+      }
+
+      // Process inline bold (**text**) and code (`code`)
+      let processedLine = line;
+      
+      // Inline code
+      const codeRegex = /`([^`]+)`/g;
+      const boldRegex = /\*\*([^*]+)\*\*/g;
+
+      // Replace bold and code with elements
+      // To keep it simple, we check if bold or code is in line, and split it
+      const lineParts = [];
+      let lastIdx = 0;
+      
+      // Simple regex parser
+      const combinedRegex = /(\*\*([^*]+)\*\*|`([^`]+)`)/g;
+      let match;
+      
+      while ((match = combinedRegex.exec(line)) !== null) {
+        const matchIdx = match.index;
+        // Text before match
+        if (matchIdx > lastIdx) {
+          lineParts.push(line.substring(lastIdx, matchIdx));
+        }
+        
+        if (match[0].startsWith('**')) {
+          lineParts.push(<strong key={`b-${matchIdx}`}>{match[2]}</strong>);
+        } else if (match[0].startsWith('`')) {
+          lineParts.push(<code key={`c-${matchIdx}`}>{match[3]}</code>);
+        }
+        
+        lastIdx = combinedRegex.lastIndex;
+      }
+      
+      if (lastIdx < line.length) {
+        lineParts.push(line.substring(lastIdx));
+      }
+
+      parts.push(
+        <p key={idx}>
+          {lineParts.length > 0 ? lineParts : line}
+        </p>
+      );
+    });
+
+    if (isCodeBlock && codeBlockContent.length > 0) {
+      parts.push(
+        <pre key="code-unclosed">
+          <code>{codeBlockContent.join('\n')}</code>
+        </pre>
+      );
+    }
+
+    return parts;
+  };
+
+  return (
+    <div className="ai-assistant-container">
+      <div className="ai-assistant-header">
+        <div className="ai-header-title">
+          <span>🤖</span>
+          <h3>CampusConnet AI Assistant</h3>
+        </div>
+      </div>
+
+      <div className="ai-messages-list">
+        {messages.map((msg) => (
+          <div key={msg.id} className={`ai-msg-row ${msg.sender}`}>
+            <div className={`ai-avatar ${msg.sender}-avatar`}>
+              {msg.sender === 'ai' ? '🤖' : '👤'}
+            </div>
+            <div className="ai-bubble">
+              {renderFormattedText(msg.text)}
+              <div style={{ fontSize: '9px', opacity: 0.6, marginTop: '5px', textAlign: msg.sender === 'user' ? 'right' : 'left' }}>
+                {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {isTyping && (
+          <div className="ai-msg-row ai">
+            <div className="ai-avatar ai-avatar">🤖</div>
+            <div className="ai-bubble">
+              <div className="ai-typing-indicator">
+                <div className="ai-typing-dot" />
+                <div className="ai-typing-dot" />
+                <div className="ai-typing-dot" />
+              </div>
+            </div>
+          </div>
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Suggestion Chips */}
+      <div className="ai-suggestions-container">
+        {suggestions.map((s, idx) => (
+          <button
+            key={idx}
+            className="ai-chip"
+            onClick={() => handleSend(s)}
+            disabled={isTyping}
+          >
+            {s}
+          </button>
+        ))}
+      </div>
+
+      {/* Input Form */}
+      <div className="ai-input-wrapper">
+        <form onSubmit={handleSubmit} className="ai-input-form">
+          <input
+            type="text"
+            className="ai-text-input"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            placeholder="Ask AI anything..."
+            disabled={isTyping}
+          />
+          <button
+            type="submit"
+            className="ai-send-btn"
+            disabled={!inputText.trim() || isTyping}
+          >
+            ➔
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default AIAssistant;

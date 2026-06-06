@@ -1,5 +1,5 @@
 .outline-student {
-  border-top: 5px solid #4a148c;
+  border-top: 5px solid var(--primary-color);
 }
 
 .student-stats-container {
@@ -27,7 +27,7 @@
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  border: 10px solid #4a148c;
+  border: 10px solid var(--primary-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -37,7 +37,7 @@
 .stat-percentage span {
   font-size: 28px;
   font-weight: 700;
-  color: #4a148c;
+  color: var(--primary-color);
 }
 
 .stat-detail {
@@ -67,7 +67,7 @@
 .profile-details strong {
   display: inline-block;
   width: 120px;
-  color: #4a148c;
+  color: var(--primary-color);
 }
 
 @media (max-width: 768px) {

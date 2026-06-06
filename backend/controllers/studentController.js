@@ -3,6 +3,7 @@ const Attendance = require('../models/Attendance');
 const Marks = require('../models/Marks');
 const Notice = require('../models/Notice');
 const Complaint = require('../models/Complaint');
+const Material = require('../models/Material');
 
 const getProfile = async (req, res) => {
   try {
@@ -69,11 +70,22 @@ const getMyComplaints = async (req, res) => {
   }
 };
 
+const getMaterials = async (req, res) => {
+  try {
+    const materials = await Material.find().populate('uploadedBy', 'name email role').sort({ date: -1 });
+    res.json({ success: true, data: materials });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error fetching study materials' });
+  }
+};
+
 module.exports = {
   getProfile,
   getMyAttendance,
   getMyMarks,
   getAllNotices,
   createComplaint,
-  getMyComplaints
+  getMyComplaints,
+  getMaterials
 };
+

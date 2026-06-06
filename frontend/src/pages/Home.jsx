@@ -1,94 +1,174 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Home.css';
-import { useState } from 'react';
 
-// Displays a beautiful Landing Page for the College
 const Home = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [selectedRole, setSelectedRole] = useState('student'); // 'student', 'teacher', 'admin'
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  
   const navigate = useNavigate();
-  const [showLoginOptions, setShowLoginOptions] = useState(false);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const response = await fetch(import.meta.env.VITE_API_URL + '/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        setError(result.message || 'Login failed.');
+        setLoading(false);
+        return;
+      }
+
+      // Check role mapping consistency
+      const userRole = result.data.user.role;
+      if (userRole !== selectedRole) {
+        setError(`Access denied. Account is registered as a ${userRole}, not a ${selectedRole}.`);
+        setLoading(false);
+        return;
+      }
+
+      localStorage.setItem('token', result.data.token);
+      localStorage.setItem('user', JSON.stringify(result.data.user));
+
+      if (userRole === 'admin') {
+        navigate('/admin-dashboard');
+      } else if (userRole === 'teacher') {
+        navigate('/teacher-dashboard');
+      } else if (userRole === 'student') {
+        navigate('/student-dashboard');
+      } else {
+        setError('Unknown user role. Contact administrator.');
+      }
+
+    } catch (err) {
+      setError('Network error. Please verify the backend is running and try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="landing-container">
-      {/* Navigation Bar */}
-      <nav className="landing-navbar">
-        <div className="landing-logo">
-          🎓 CampusConnect Portal
-        </div>
-        <div className="landing-nav-links">
-          <a href="#about">About</a>
-          <a href="#features">Features</a>
-          <button className="cta-btn" onClick={() => setShowLoginOptions(true)}>Login</button>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <header className="hero-section">
-        <div className="hero-content">
-          <h1>Empowering the Next Generation of Innovators</h1>
-          <p>
-            Experience seamless communication, real-time tracking, and comprehensive academic tools designed for students, teachers, and administrators.
-          </p>
-          <div className="hero-buttons">
-            <button className="primary-btn" onClick={() => setShowLoginOptions(true)}>Get Started</button>
-            <a href="#features" className="secondary-btn">Explore Features</a>
-          </div>
-        </div>
-        <div className="hero-image">
-          <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="College Campus" />
+    <div className="portal-landing-container split-layout">
+      {/* Top Header Navbar */}
+      <header className="portal-landing-header">
+        <div className="header-brand">
+          <span className="header-logo">🎓</span>
+          <h2>CampusConnect</h2>
         </div>
       </header>
 
-      {/* Features Section */}
-      <section id="features" className="features-section">
-        <h2>Why Choose Our Portal?</h2>
-        <div className="features-grid">
-          <div className="feature-card card-shadow">
-            <h3>🏫 Centralized Administration</h3>
-            <p>Administer student and teacher records securely in one place. Resolve complaints swiftly.</p>
-          </div>
-          <div className="feature-card card-shadow">
-            <h3>👨‍🏫 Empowered Teachers</h3>
-            <p>Seamlessly upload marks, manage attendance, and distribute assignments without hassle.</p>
-          </div>
-          <div className="feature-card card-shadow">
-            <h3>🎓 Student Access</h3>
-            <p>Students can track their progress, view attendance, and keep up with college notices.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="landing-footer">
-        <p>&copy; 2026 CampusConnect Portal. All rights reserved.</p>
-        <p className="designer-tag">Designed by <strong>PEDDI RAYUDU</strong></p>
-      </footer>
-
-      {/* Login Options Modal */}
-      {showLoginOptions && (
-        <div className="login-modal-overlay" onClick={() => setShowLoginOptions(false)}>
-          <div className="login-modal card-shadow" onClick={e => e.stopPropagation()}>
-            <button className="close-modal" onClick={() => setShowLoginOptions(false)}>×</button>
-            <h2>Select Your Role</h2>
-            <p>Choose your portal login to proceed</p>
-            <div className="role-cards-container">
-              <div className="role-card admin-card card-shadow" onClick={() => navigate('/admin-login')}>
-                <h2>Admin</h2>
-                <button className="login-nav-btn admin-btn">Login as Admin</button>
-              </div>
-
-              <div className="role-card teacher-card card-shadow" onClick={() => navigate('/teacher-login')}>
-                <h2>Teacher</h2>
-                <button className="login-nav-btn teacher-btn">Login as Teacher</button>
-              </div>
-
-              <div className="role-card student-card card-shadow" onClick={() => navigate('/student-login')}>
-                <h2>Student</h2>
-                <button className="login-nav-btn student-btn">Login as Student</button>
-              </div>
+      {/* Main Split Content */}
+      <div className="portal-split-main">
+        {/* Left Panel: Academic Image Banner */}
+        <div className="portal-left-panel">
+          <div className="panel-overlay">
+            <div className="panel-content">
+              <h1>CampusConnect</h1>
+              <p>Your academic gateway. Seamlessly access attendance, schedules, resources, and grades.</p>
             </div>
           </div>
         </div>
-      )}
+
+        {/* Right Panel: Clean Login Area */}
+        <div className="portal-right-panel">
+          {/* Centered Login Box */}
+          <main className="portal-main-content simple-center">
+            <div className="portal-login-card card-shadow simple-card no-borders">
+              <div className="login-card-header">
+                <h2>Account Login</h2>
+                <p className="login-subtitle">Please select your role and sign in below</p>
+              </div>
+
+              {/* Role selection tabs */}
+              <div className="login-role-tabs">
+                <button 
+                  className={`role-tab-btn ${selectedRole === 'student' ? 'active' : ''}`}
+                  onClick={() => { setSelectedRole('student'); setError(''); }}
+                >
+                  Student
+                </button>
+                <button 
+                  className={`role-tab-btn ${selectedRole === 'teacher' ? 'active' : ''}`}
+                  onClick={() => { setSelectedRole('teacher'); setError(''); }}
+                >
+                  Teacher
+                </button>
+                <button 
+                  className={`role-tab-btn ${selectedRole === 'admin' ? 'active' : ''}`}
+                  onClick={() => { setSelectedRole('admin'); setError(''); }}
+                >
+                  Admin
+                </button>
+              </div>
+
+              {/* Login Form */}
+              <form onSubmit={handleLogin} className="portal-login-form">
+                <div className="form-input-group">
+                  <label htmlFor="email">Email Address</label>
+                  <div className="portal-input-container">
+                    <input 
+                      id="email"
+                      type="email" 
+                      value={email} 
+                      onChange={(e) => setEmail(e.target.value)} 
+                      required 
+                      placeholder="name@gmail.com"
+                      className="input-with-icon-right"
+                    />
+                    <span className="input-icon-right">✉️</span>
+                  </div>
+                </div>
+
+                <div className="form-input-group">
+                  <label htmlFor="password">Password</label>
+                  <div className="portal-input-container">
+                    <input 
+                      id="password"
+                      type={showPassword ? "text" : "password"} 
+                      value={password} 
+                      onChange={(e) => setPassword(e.target.value)} 
+                      required 
+                      placeholder="password"
+                      className="input-with-icon-right"
+                    />
+                    <button 
+                      type="button"
+                      className="password-toggle-btn"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? 'Hide' : 'Show'}
+                    </button>
+                  </div>
+                </div>
+
+                <button type="submit" className="login-submit-btn" disabled={loading}>
+                  {loading ? 'Signing In...' : `Sign In`}
+                </button>
+              </form>
+
+              {error && <div className="login-error-message">{error}</div>}
+            </div>
+          </main>
+
+          {/* Footer for Rights Reserved */}
+          <footer className="portal-footer simple-footer">
+            <p>&copy; 2026 CampusConnect Portal. All Rights Reserved.</p>
+          </footer>
+        </div>
+      </div>
     </div>
   );
 };

@@ -1,26 +1,32 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 
 // Import Pages
 import Home from './pages/Home';
-import AdminLogin from './pages/AdminLogin';
-import TeacherLogin from './pages/TeacherLogin';
-import StudentLogin from './pages/StudentLogin';
+import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import TeacherDashboard from './pages/TeacherDashboard';
 import StudentDashboard from './pages/StudentDashboard';
 
 // Main Application Component
 function App() {
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', 'light');
+  }, []);
+
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
         
-        {/* Login routes */}
-        <Route path="/admin-login" element={<AdminLogin />} />
-        <Route path="/teacher-login" element={<TeacherLogin />} />
-        <Route path="/student-login" element={<StudentLogin />} />
+        {/* Redirect unified Login route to Home page */}
+        <Route path="/login" element={<Navigate to="/" replace />} />
+        
+        {/* Redirect old login routes to unified login */}
+        <Route path="/admin-login" element={<Navigate to="/login" replace />} />
+        <Route path="/teacher-login" element={<Navigate to="/login" replace />} />
+        <Route path="/student-login" element={<Navigate to="/login" replace />} />
 
         {/* Protected Dashboard routes */}
         <Route path="/admin-dashboard" element={
@@ -47,3 +53,4 @@ function App() {
 }
 
 export default App;
+

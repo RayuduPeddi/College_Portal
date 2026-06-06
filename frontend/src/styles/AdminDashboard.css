@@ -8,7 +8,7 @@
   flex: 1;
   padding: 30px;
   text-align: center;
-  border-left: 5px solid #1a237e;
+  border-left: 5px solid var(--primary-color);
 }
 
 .stat-card h3 {
@@ -20,11 +20,11 @@
 .stat-number {
   font-size: 36px;
   font-weight: 700;
-  color: #1a237e;
+  color: var(--primary-color);
 }
 
 .tab-section > h2 {
-  color: #1a237e;
+  color: var(--primary-color);
   margin-bottom: 15px;
   margin-top: 25px;
   font-size: 20px;
@@ -39,19 +39,30 @@
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  align-items: center;
 }
 
-.add-form input {
+.add-form input,
+.add-form .searchable-select-wrapper {
   flex: 1;
   min-width: 180px;
+  max-width: 240px;
   margin: 0;
 }
 
 .action-btn {
   padding: 10px 20px;
-  background-color: #1a237e;
+  background-color: var(--primary-color);
   color: white;
   min-width: 120px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
 }
 
 .table-container {

@@ -1,332 +1,459 @@
-/* Landing Page Container */
-.landing-container {
+/* Simple Centered Login Page Styles */
+.portal-landing-container.split-layout {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f0f4fd 0%, #ffffff 100%);
-  font-family: 'Poppins', sans-serif;
-  overflow-x: hidden;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Navbar */
-.landing-navbar {
+/* Landing Top Header Navbar */
+.portal-landing-header {
+  height: 64px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 20px 50px;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 100;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  justify-content: space-between;
+  padding: 0 40px;
+  background-color: var(--surface-color);
+  border-bottom: 1.5px solid var(--card-border);
+  z-index: 50;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-.landing-logo {
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-logo {
   font-size: 24px;
-  font-weight: 700;
-  color: #1a237e;
 }
 
-.landing-nav-links {
-  display: flex;
-  align-items: center;
-  gap: 30px;
-}
-
-.landing-nav-links a {
-  text-decoration: none;
-  color: #333;
-  font-weight: 500;
-  transition: color 0.3s;
-}
-
-.landing-nav-links a:hover {
-  color: #1a237e;
-}
-
-.cta-btn {
-  background: #1a237e;
-  color: white;
-  padding: 10px 25px;
-  border-radius: 25px;
-  font-weight: 600;
-}
-
-.cta-btn:hover {
-  background: #283593;
-}
-
-/* Hero Section */
-.hero-section {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 120px 50px 80px;
-  min-height: 80vh;
-}
-
-.hero-content {
-  flex: 1;
-  max-width: 600px;
-}
-
-.hero-content h1 {
-  font-size: 48px;
-  font-weight: 800;
-  color: #111;
-  line-height: 1.2;
-  margin-bottom: 20px;
-}
-
-.hero-content p {
-  font-size: 18px;
-  color: #666;
-  margin-bottom: 40px;
-  line-height: 1.6;
-}
-
-.hero-buttons {
-  display: flex;
-  gap: 20px;
-}
-
-.primary-btn {
-  background: #1a237e;
-  color: white;
-  padding: 15px 30px;
-  font-size: 16px;
-  font-weight: 600;
-  border-radius: 30px;
-  box-shadow: 0 8px 15px rgba(26, 35, 126, 0.3);
-}
-
-.primary-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 20px rgba(26, 35, 126, 0.4);
-}
-
-.secondary-btn {
-  background: transparent;
-  color: #1a237e;
-  border: 2px solid #1a237e;
-  padding: 13px 30px;
-  font-size: 16px;
-  font-weight: 600;
-  border-radius: 30px;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  transition: all 0.3s;
-}
-
-.secondary-btn:hover {
-  background: #f0f4fd;
-}
-
-.hero-image {
-  flex: 1;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.hero-image img {
-  width: 100%;
-  max-width: 550px;
-  border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-  animation: float 6s ease-in-out infinite;
-}
-
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-15px); }
-  100% { transform: translateY(0px); }
-}
-
-/* Features */
-.features-section {
-  padding: 80px 50px;
-  background: white;
-  text-align: center;
-}
-
-.features-section h2 {
-  font-size: 36px;
-  color: #111;
-  margin-bottom: 50px;
-}
-
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 40px;
-}
-
-.feature-card {
-  padding: 40px 30px;
-  background: #fff;
-  border-radius: 20px;
-  text-align: center;
-  transition: transform 0.3s;
-  border: 1px solid #eee;
-}
-
-.feature-card:hover {
-  transform: translateY(-10px);
-  border-color: #1a237e;
-}
-
-.feature-card h3 {
-  font-size: 24px;
-  color: #1a237e;
-  margin-bottom: 15px;
-}
-
-.feature-card p {
-  color: #666;
-  line-height: 1.6;
-}
-
-/* Footer */
-.landing-footer {
-  text-align: center;
-  padding: 30px;
-  background: #111;
-  color: #fff;
-  margin-top: auto;
-}
-
-.designer-tag {
-  margin-top: 10px;
-  font-size: 14px;
-  color: #aaa;
-}
-
-.designer-tag strong {
-  color: #fff;
-  letter-spacing: 1px;
-}
-
-/* Custom Modal using Backdrop */
-.login-modal-overlay {
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(5px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.3s forwards;
-}
-
-.login-modal {
-  background: white;
-  padding: 40px;
-  border-radius: 20px;
-  max-width: 800px;
-  width: 90%;
-  position: relative;
-  text-align: center;
-}
-
-.close-modal {
-  position: absolute;
-  top: 15px;
-  right: 20px;
-  font-size: 28px;
-  background: none;
-  border: none;
-  color: #666;
-}
-
-.close-modal:hover {
-  color: #000;
-}
-
-.login-modal h2 {
-  font-size: 28px;
-  color: #1a237e;
-  margin-bottom: 10px;
-}
-
-.login-modal > p {
-  color: #666;
-  margin-bottom: 30px;
-}
-
-/* Role Cards mapping from before, repurposed for modal */
-.role-cards-container {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.role-card {
-  padding: 30px 20px;
-  border-radius: 12px;
-  width: 200px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  text-align: center;
-}
-
-.role-card h2 {
+.header-brand h2 {
   font-size: 20px;
-  margin-bottom: 20px;
-  color: #333;
+  font-weight: 800;
+  color: var(--primary-color);
+  letter-spacing: -0.5px;
+  margin: 0;
 }
 
-.admin-card { border-top: 5px solid #283593; }
-.teacher-card { border-top: 5px solid #00796b; }
-.student-card { border-top: 5px solid #6a1b9a; }
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
 
-.login-nav-btn {
-  padding: 10px;
-  color: white;
+.portal-info-tag {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary-color);
+  background: rgba(30, 58, 138, 0.08);
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(30, 58, 138, 0.15);
+}
+
+[data-theme='dark'] .portal-info-tag {
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--secondary-color);
+  border-color: rgba(59, 130, 246, 0.25);
+}
+
+/* Floating/Header Theme Switcher Button */
+.portal-theme-btn.simple-toggle-header {
+  background: var(--background-color);
+  color: var(--text-color);
+  border: 1.5px solid var(--card-border);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px var(--shadow-color);
+  transition: all 0.2s ease;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.portal-theme-btn.simple-toggle-header:hover {
+  transform: translateY(-1px);
+  background: var(--surface-color);
+}
+
+/* Split Content Area */
+.portal-split-main {
+  display: flex;
+  flex: 1;
+  height: calc(100vh - 64px);
+  overflow: hidden;
+  padding: 30px;
+  gap: 30px;
+  background-color: var(--background-color);
+}
+
+/* Left Graphic Banner Panel */
+.portal-left-panel {
+  flex: 1.25;
+  background-image: url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1200&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 35px var(--shadow-color);
+}
+
+.panel-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.4) 0%, rgba(15, 23, 42, 0.8) 100%);
+  display: flex;
+  align-items: flex-end;
+  padding: 60px 50px;
+}
+
+.panel-content {
+  color: #ffffff;
+  max-width: 540px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.panel-content h1 {
+  font-size: 38px;
+  font-weight: 800;
+  margin-bottom: 15px;
+  letter-spacing: -1px;
+}
+
+.panel-content p {
+  font-size: 15.5px;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+/* Right Login Form Panel */
+.portal-right-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--surface-color);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 10px 35px var(--shadow-color);
+  position: relative;
+  justify-content: space-between;
+  height: 100%;
+  border-radius: 20px;
+  overflow-y: auto;
+}
+
+/* Floating Theme Switcher Button */
+.portal-theme-btn.simple-toggle {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: var(--surface-color);
+  color: var(--text-color);
+  border: 1.5px solid var(--card-border);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px var(--shadow-color);
+  transition: all 0.25s ease;
+  z-index: 100;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.portal-theme-btn.simple-toggle:hover {
+  transform: translateY(-1px);
+  background: var(--background-color);
+  box-shadow: 0 6px 16px var(--shadow-color);
+}
+
+/* Centered Main Area */
+.portal-main-content.simple-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
   width: 100%;
+}
+
+/* Login Card Container */
+.portal-login-card.simple-card {
+  width: 100%;
+  max-width: 430px;
+  background: var(--surface-color);
+  padding: 40px 32px;
+  border-radius: 16px;
+  border: 1.5px solid var(--card-border);
+  box-shadow: 0 8px 24px var(--shadow-color);
+  border-top: 5px solid var(--primary-color);
+  transition: all 0.3s ease;
+}
+
+.portal-login-card.simple-card.no-borders {
+  border: none !important;
+  border-top: none !important;
+  box-shadow: 0 10px 30px var(--shadow-color) !important;
+  background: var(--surface-color) !important;
+}
+
+.login-card-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.login-emblem {
+  font-size: 40px;
+  margin-bottom: 8px;
+}
+
+.login-card-header h2 {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--primary-color);
+  margin: 0 0 6px 0;
+  letter-spacing: -0.5px;
+}
+
+.login-card-header p {
+  font-size: 13.5px;
+  color: var(--neutral-color);
+  margin: 0;
+}
+
+/* Role Selection Tabs */
+.login-role-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  background: var(--background-color);
+  padding: 4px;
   border-radius: 8px;
+  margin-bottom: 25px;
+}
+
+.role-tab-btn {
+  background: transparent;
+  border: none;
+  padding: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--neutral-color);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.role-tab-btn.active {
+  background: var(--surface-color);
+  color: var(--primary-color);
+  box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+/* Input Fields & Forms */
+.portal-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-input-group label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-color);
+  opacity: 0.85;
+}
+
+.form-input-group input {
+  padding: 10px 14px !important;
+  margin: 0 !important;
+  border: 1.5px solid var(--card-border) !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  color: var(--text-color) !important;
+  background-color: var(--background-color) !important;
+  transition: all 0.2s ease !important;
+}
+
+.form-input-group input:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.12) !important;
+  background-color: var(--surface-color) !important;
+}
+
+/* Captcha styling */
+.captcha-group label {
+  color: var(--accent-color) !important;
+}
+
+/* Submit Button styling */
+.login-submit-btn {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 12px;
+  font-size: 14.5px;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.15);
+  transition: all 0.2s ease;
+  margin-top: 10px;
+}
+
+.login-submit-btn:hover:not(:disabled) {
+  filter: brightness(1.1);
+  box-shadow: 0 6px 16px rgba(30, 64, 175, 0.25);
+  transform: translateY(-1px);
+}
+
+.login-submit-btn:disabled {
+  background-color: var(--neutral-color);
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.login-error-message {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.4;
+  margin-top: 15px;
+  font-weight: 500;
+}
+
+
+
+/* Input container with right-side icons / actions */
+.portal-input-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-icon-right {
+  padding-right: 45px !important;
+  width: 100%;
+}
+
+.input-icon-right {
+  position: absolute;
+  right: 14px;
+  font-size: 16px;
+  color: var(--neutral-color);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 8px;
+  background: transparent !important;
+  border: none !important;
+  color: var(--primary-color) !important;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 10px;
+  transition: opacity 0.2s;
+  box-shadow: none !important;
+  border-radius: 4px;
+}
+
+.password-toggle-btn:hover {
+  opacity: 0.8;
+  filter: none !important;
+  background: transparent !important;
+}
+
+/* Login Card Footer for Developer Attribution */
+.login-card-footer {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--card-border);
+  text-align: center;
+}
+
+.login-card-footer p {
+  font-size: 13px;
+  color: var(--neutral-color);
+  margin: 0;
+}
+
+.login-card-footer strong {
+  color: var(--primary-color);
   font-weight: 600;
 }
 
-.admin-btn { background-color: #283593; }
-.teacher-btn { background-color: #00796b; }
-.student-btn { background-color: #6a1b9a; }
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+/* Footer inside right panel */
+.portal-footer.simple-footer {
+  padding: 10px 16px;
+  text-align: center;
+  border-top: 1.5px solid var(--card-border);
+  background-color: var(--surface-color);
+  transition: background-color 0.3s ease;
 }
 
-/* Mobile Settings */
-@media (max-width: 900px) {
-  .hero-section {
+.portal-footer.simple-footer p {
+  font-size: 12.5px;
+  color: var(--neutral-color);
+  margin: 0;
+}
+
+/* Responsiveness for Split Layout */
+@media (max-width: 992px) {
+  .portal-left-panel {
+    display: none;
+  }
+  
+  .portal-split-main {
     flex-direction: column;
-    text-align: center;
-    padding: 100px 30px 50px;
+    height: calc(100vh - 64px);
+    padding: 0;
+    gap: 0;
   }
   
-  .hero-content {
-    margin-bottom: 50px;
+  .portal-right-panel {
+    flex: 1;
+    width: 100%;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
   }
-  
-  .hero-buttons {
-    justify-content: center;
+
+  .portal-landing-header {
+    padding: 0 20px;
   }
-  
-  .hero-image {
-    justify-content: center;
+
+  .portal-info-tag {
+    display: none;
   }
 }
 
-@media (max-width: 600px) {
-  .landing-navbar { padding: 15px 20px; }
-  .landing-nav-links a { display: none; } /* Hide links on mobile, keep CTA */
-  .hero-content h1 { font-size: 36px; }
-  .role-cards-container { flex-direction: column; align-items: center; }
-  .role-card { width: 100%; }
-}

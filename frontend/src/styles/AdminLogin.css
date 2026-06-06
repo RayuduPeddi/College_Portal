@@ -48,3 +48,27 @@
   filter: none;
   color: #333;
 }
+
+.forgot-password-link-container {
+  text-align: right;
+  margin-top: 5px;
+  margin-bottom: 15px;
+}
+
+.forgot-password-link {
+  background: none;
+  border: none;
+  color: #1a237e;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  box-shadow: none !important;
+}
+
+.forgot-password-link:hover {
+  color: #3f51b5;
+  filter: none !important;
+}
+

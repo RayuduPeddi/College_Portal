@@ -4,6 +4,7 @@ const Marks = require('../models/Marks');
 const Teacher = require('../models/Teacher');
 const User = require('../models/User');
 const Notice = require('../models/Notice');
+const Material = require('../models/Material');
 
 const getAllStudents = async (req, res) => {
   try {
@@ -197,6 +198,53 @@ const updateMarks = async (req, res) => {
   }
 };
 
+const uploadMaterial = async (req, res) => {
+  try {
+    const { title, description, subject } = req.body;
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No file uploaded' });
+    }
+    if (!title || !subject) {
+      return res.status(400).json({ success: false, message: 'Title and Subject are required' });
+    }
+    const newMaterial = new Material({
+      title,
+      description,
+      subject,
+      fileUrl: `/uploads/${req.file.filename}`,
+      fileName: req.file.originalname,
+      uploadedBy: req.user.id
+    });
+    await newMaterial.save();
+    res.json({ success: true, data: newMaterial });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Error uploading study material' });
+  }
+};
+
+const getMyMaterials = async (req, res) => {
+  try {
+    const materials = await Material.find({ uploadedBy: req.user.id }).populate('uploadedBy', 'name email').sort({ date: -1 });
+    res.json({ success: true, data: materials });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error fetching materials' });
+  }
+};
+
+const deleteMaterial = async (req, res) => {
+  try {
+    const material = await Material.findOne({ _id: req.params.id, uploadedBy: req.user.id });
+    if (!material) {
+      return res.status(404).json({ success: false, message: 'Material not found or unauthorized' });
+    }
+    await Material.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: 'Material deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error deleting material' });
+  }
+};
+
 module.exports = {
   getAllStudents,
   markAttendance,
@@ -206,5 +254,9 @@ module.exports = {
   getMyAssignedMarks,
   updateMarks,
   getProfile,
-  getAllNotices
+  getAllNotices,
+  uploadMaterial,
+  getMyMaterials,
+  deleteMaterial
 };
+

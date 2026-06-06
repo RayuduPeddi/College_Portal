@@ -58,7 +58,7 @@ const TeacherLogin = () => {
               value={email} 
               onChange={(e) => setEmail(e.target.value)} 
               required 
-              placeholder="Enter teacher email"
+              placeholder="name@gmail.com"
             />
           </div>
           <div>
