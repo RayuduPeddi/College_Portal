@@ -47,8 +47,8 @@ const AdminLogin = () => {
       localStorage.setItem('token', result.data.token);
       localStorage.setItem('user', JSON.stringify(result.data.user));
 
-      // Redirect to the dashboard
-      navigate('/admin-dashboard');
+      // Redirect to the dashboard and replace history entry
+      navigate('/admin-dashboard', { replace: true });
 
     } catch (err) {
       setError('Network error. Please try again later.');
@@ -189,7 +189,9 @@ const AdminLogin = () => {
         {error && <div className="error-message" style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
         {successMessage && <div className="success-message" style={{ color: 'green', marginTop: '10px', fontWeight: '500' }}>{successMessage}</div>}
         {!showForgot && (
-          <button className="back-btn" onClick={() => navigate('/')}>Back to Home</button>
+          <button className="back-btn" onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}>
+            Back to Previous
+          </button>
         )}
       </div>
     </div>

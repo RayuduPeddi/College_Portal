@@ -38,8 +38,8 @@ const TeacherLogin = () => {
       localStorage.setItem('token', result.data.token);
       localStorage.setItem('user', JSON.stringify(result.data.user));
 
-      // Redirect to the dashboard
-      navigate('/teacher-dashboard');
+      // Redirect to the dashboard and remove login from history
+      navigate('/teacher-dashboard', { replace: true });
 
     } catch (err) {
       setError('Network error. Please try again later.');
@@ -74,7 +74,9 @@ const TeacherLogin = () => {
           <button type="submit" className="login-submit-btn teacher-btn-color">Login</button>
         </form>
         {error && <div className="error-message">{error}</div>}
-        <button className="back-btn" onClick={() => navigate('/')}>Back to Home</button>
+        <button className="back-btn" onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}>
+          Back to Previous
+        </button>
       </div>
     </div>
   );

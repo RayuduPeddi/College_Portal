@@ -96,8 +96,8 @@ const Login = () => {
 
         {error && <div className="login-error-msg">{error}</div>}
 
-        <button className="login-back-home-btn" onClick={() => navigate('/')}>
-          Back to Home
+        <button className="login-back-home-btn" onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/') }>
+          Back to Previous
         </button>
       </div>
     </div>
