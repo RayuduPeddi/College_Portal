@@ -46,9 +46,25 @@ const AIAssistant = () => {
     "🛰️ The connection dropped! Let's reestablish and try that again."
   ];
 
+  const limitExceededMessages = [
+    "⏰ Whoa! You're too fast for me! I've hit my thinking limit. Give me a breather and try again in a moment!",
+    "🚨 Hold up! You've reached my speed limit! I need to cool down before we chat again.",
+    "🎬 Cut! We're moving too fast here! Let's pause for a moment and resume later.",
+    "💨 Zoom! I can't keep up with your pace! My throttle is maxed out. Let's wait a bit!",
+    "🏁 You're breaking my rate limit! Slow down, you speedster! 😄 Try again soon.",
+    "⚡ My circuits are overheating from all this excitement! Let me cool off and we'll chat again!"
+  ];
+
   // Get a random cool error message
-  const getRandomErrorMessage = (isNetworkError = false) => {
-    const messages = isNetworkError ? networkErrorMessages : coolErrorMessages;
+  const getRandomErrorMessage = (errorType = 'generic') => {
+    let messages;
+    if (errorType === 'network') {
+      messages = networkErrorMessages;
+    } else if (errorType === 'limit') {
+      messages = limitExceededMessages;
+    } else {
+      messages = coolErrorMessages;
+    }
     return messages[Math.floor(Math.random() * messages.length)];
   };
 
@@ -117,12 +133,19 @@ const AIAssistant = () => {
         typeMessage(result.text, 'ai-' + Date.now().toString());
       } else {
         setIsTyping(false);
+        // Detect if it's a limit/rate error
+        const errorMessage = result.message?.toLowerCase() || '';
+        const isLimitError = errorMessage.includes('limit') || errorMessage.includes('rate') || 
+                            errorMessage.includes('quota') || errorMessage.includes('throttle');
+        
+        const errorType = isLimitError ? 'limit' : 'generic';
+        
         setMessages((prev) => [
           ...prev,
           {
             id: 'err-' + Date.now().toString(),
             sender: 'ai',
-            text: getRandomErrorMessage(false),
+            text: getRandomErrorMessage(errorType),
             createdAt: new Date()
           }
         ]);
@@ -130,12 +153,16 @@ const AIAssistant = () => {
     } catch (err) {
       console.error(err);
       setIsTyping(false);
+      // Detect if it's a network error
+      const isNetworkError = err.message?.includes('fetch') || err instanceof TypeError;
+      const errorType = isNetworkError ? 'network' : 'generic';
+      
       setMessages((prev) => [
         ...prev,
         {
           id: 'err-' + Date.now().toString(),
           sender: 'ai',
-          text: getRandomErrorMessage(true),
+          text: getRandomErrorMessage(errorType),
           createdAt: new Date()
         }
       ]);
