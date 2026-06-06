@@ -38,6 +38,14 @@ const seedDB = async () => {
     });
     await admin.save();
 
+        const admin2 = new User({
+      name: 'PEDDI RAJITHA',
+      email: 'admin2@gmail.com',
+      password: hashedAdminPassword,
+      role: 'admin'
+    });
+    await admin2.save();
+
     // 2. Create Teachers
     const teacher1 = new User({ name: 'Dr.Santhosh Kumar', email: 'teacher1@gmail.com', password: hashedTeacherPassword, role: 'teacher' });
     const savedTeacher1 = await teacher1.save();

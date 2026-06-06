@@ -191,6 +191,72 @@
   width: 100%;
 }
 
+@media (max-width: 992px) {
+  .portal-landing-container.split-layout {
+    height: auto;
+    min-height: 100vh;
+  }
+  .portal-landing-header {
+    padding: 0 18px;
+    flex-wrap: wrap;
+    gap: 12px;
+    height: auto;
+  }
+  .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .portal-split-main {
+    flex-direction: column;
+    height: auto;
+    padding: 20px 18px;
+    gap: 20px;
+  }
+  .portal-left-panel {
+    min-height: 320px;
+    background-position: center center;
+  }
+  .panel-overlay {
+    padding: 24px;
+    align-items: flex-start;
+  }
+  .panel-content h1 {
+    font-size: 32px;
+  }
+  .panel-content p {
+    font-size: 15px;
+  }
+  .portal-right-panel {
+    height: auto;
+    padding: 20px;
+  }
+  .portal-login-card.simple-card {
+    padding: 32px 24px;
+  }
+  .portal-theme-btn.simple-toggle {
+    top: 14px;
+    right: 14px;
+    padding: 8px 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .portal-split-main {
+    padding: 16px 12px;
+  }
+  .portal-left-panel {
+    min-height: 260px;
+  }
+  .panel-overlay {
+    padding: 18px;
+  }
+  .portal-login-card.simple-card {
+    padding: 26px 18px;
+  }
+}
+
 /* Login Card Container */
 .portal-login-card.simple-card {
   width: 100%;

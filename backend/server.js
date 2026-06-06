@@ -12,9 +12,19 @@ const app = express();
 const server = http.createServer(app);
 
 // Setup Socket.io
+const parseCorsOrigins = () => {
+  const rawOrigins = process.env.CORS_ORIGIN || 'http://localhost:5173';
+  return rawOrigins
+    .split(',')
+    .map(origin => origin.trim())
+    .filter(Boolean);
+};
+
+const allowedOrigins = parseCorsOrigins();
+
 const io = socketIo(server, {
   cors: {
-    origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : "http://localhost:5173",
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true
   }
@@ -24,7 +34,13 @@ const io = socketIo(server, {
 app.set('socketio', io);
 
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : "http://localhost:5173",
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   credentials: true
 };

@@ -74,4 +74,14 @@
   .student-stats-container {
     flex-direction: column;
   }
+  .student-stat-card,
+  .student-profile-card {
+    width: 100%;
+    padding: 20px;
+  }
+  .profile-details strong {
+    display: block;
+    width: 100%;
+    margin-bottom: 6px;
+  }
 }

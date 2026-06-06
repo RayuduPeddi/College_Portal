@@ -37,13 +37,14 @@
 }
 
 html, body {
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100%;
+  overflow-x: hidden;
   margin: 0;
   padding: 0;
 }
 
 body {
+  min-height: 100%;
   font-family: 'Poppins', 'Inter', system-ui, -apple-system, sans-serif;
   background-color: var(--background-color);
   color: var(--text-color);
@@ -137,6 +138,22 @@ input:focus, select:focus {
   margin-top: 10px;
   font-size: 0.9em;
   text-align: center;
+}
+
+@media (max-width: 768px) {
+  .dashboard-content {
+    padding: 14px 12px;
+  }
+  .dashboard-layout {
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  .main-content-area {
+    min-height: 100vh;
+  }
+  .card-shadow {
+    box-shadow: none;
+  }
 }
 
 .loader {

@@ -44,3 +44,23 @@
   font-size: 16px;
   font-weight: 500;
 }
+@media (max-width: 768px) {
+  .profile-card,
+  .teacher-form {
+    width: 100%;
+    max-width: 100%;
+    padding: 20px;
+  }
+  .profile-card strong {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  .teacher-form label {
+    margin-top: 12px;
+  }
+  .teacher-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
