@@ -11,8 +11,8 @@ gmail:teacher1@gmail.com
 password:teacher123
 
 Student:
-gmail:rayudu@gmail.com
-password:rayudu
+gmail:student@gmail.com
+password:student123
 
 
 
