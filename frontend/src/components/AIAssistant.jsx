@@ -6,7 +6,7 @@ const AIAssistant = () => {
     {
       id: 'welcome',
       sender: 'ai',
-      text: 'Hello! I am **CampusConnet AI**, your academic and portal assistant. How can I help you today?',
+      text: '🚀 Yo! I\'m your **CampusConnect AI** buddy! Ready to help with notices, emails, study plans, or anything academic. What\'s on your mind? 🧠',
       createdAt: new Date()
     }
   ]);
