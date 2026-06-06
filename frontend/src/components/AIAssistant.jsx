@@ -25,6 +25,33 @@ const AIAssistant = () => {
     'Explain portal features'
   ];
 
+  // Cool error messages to display when something goes wrong
+  const coolErrorMessages = [
+    "🤔 Oops! My AI circuits got a little tangled. Let me catch my breath and try again!",
+    "😅 Whoopsie! I had a little hiccup processing that. Mind giving it another shot?",
+    "🚀 My engines are sputtering! Let's try that question once more.",
+    "🎯 Looks like I missed the mark this time. Fancy another attempt?",
+    "💫 I had a momentary lapse of logic. Let's give it another go!",
+    "🌟 Hmm, that didn't go as planned. Ready to try again?",
+    "⚡ I'm still waking up! Let me try that again for you.",
+    "🎪 I tripped over my own code there! Care to ask again?"
+  ];
+
+  const networkErrorMessages = [
+    "📡 Looks like the connection took a coffee break! Check your internet and try again.",
+    "🌐 Oops! My connection to the brain ended. Let's reconnect!",
+    "⚠️ The digital highway has a detour. Verify your connection and retry!",
+    "🔌 Network hiccup detected! Let's check your internet and try once more.",
+    "📶 Signal loss! Make sure you're connected and try again.",
+    "🛰️ The connection dropped! Let's reestablish and try that again."
+  ];
+
+  // Get a random cool error message
+  const getRandomErrorMessage = (isNetworkError = false) => {
+    const messages = isNetworkError ? networkErrorMessages : coolErrorMessages;
+    return messages[Math.floor(Math.random() * messages.length)];
+  };
+
   // Auto scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -95,7 +122,7 @@ const AIAssistant = () => {
           {
             id: 'err-' + Date.now().toString(),
             sender: 'ai',
-            text: '⚠️ Sorry, I encountered an issue fetching the response. Please try again.',
+            text: getRandomErrorMessage(false),
             createdAt: new Date()
           }
         ]);
@@ -108,7 +135,7 @@ const AIAssistant = () => {
         {
           id: 'err-' + Date.now().toString(),
           sender: 'ai',
-          text: '⚠️ Network error. Please verify the backend server is running and try again.',
+          text: getRandomErrorMessage(true),
           createdAt: new Date()
         }
       ]);
