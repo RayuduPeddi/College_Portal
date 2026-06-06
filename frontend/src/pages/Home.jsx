@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Home.css';
 
@@ -6,7 +6,6 @@ const Home = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [selectedRole, setSelectedRole] = useState('student'); // 'student', 'teacher', 'admin'
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
@@ -32,17 +31,12 @@ const Home = () => {
         return;
       }
 
-      // Check role mapping consistency
-      const userRole = result.data.user.role;
-      if (userRole !== selectedRole) {
-        setError(`Access denied. Account is registered as a ${userRole}, not a ${selectedRole}.`);
-        setLoading(false);
-        return;
-      }
-
+      // Save token and user details to local storage
       localStorage.setItem('token', result.data.token);
       localStorage.setItem('user', JSON.stringify(result.data.user));
 
+      // Route based on user role from JWT
+      const userRole = result.data.user.role;
       if (userRole === 'admin') {
         navigate('/admin-dashboard');
       } else if (userRole === 'teacher') {
@@ -89,29 +83,7 @@ const Home = () => {
             <div className="portal-login-card card-shadow simple-card no-borders">
               <div className="login-card-header">
                 <h2>Account Login</h2>
-                <p className="login-subtitle">Please select your role and sign in below</p>
-              </div>
-
-              {/* Role selection tabs */}
-              <div className="login-role-tabs">
-                <button 
-                  className={`role-tab-btn ${selectedRole === 'student' ? 'active' : ''}`}
-                  onClick={() => { setSelectedRole('student'); setError(''); }}
-                >
-                  Student
-                </button>
-                <button 
-                  className={`role-tab-btn ${selectedRole === 'teacher' ? 'active' : ''}`}
-                  onClick={() => { setSelectedRole('teacher'); setError(''); }}
-                >
-                  Teacher
-                </button>
-                <button 
-                  className={`role-tab-btn ${selectedRole === 'admin' ? 'active' : ''}`}
-                  onClick={() => { setSelectedRole('admin'); setError(''); }}
-                >
-                  Admin
-                </button>
+                <p className="login-subtitle">Sign in with your credentials</p>
               </div>
 
               {/* Login Form */}
@@ -155,7 +127,7 @@ const Home = () => {
                 </div>
 
                 <button type="submit" className="login-submit-btn" disabled={loading}>
-                  {loading ? 'Signing In...' : `Sign In`}
+                  {loading ? 'Signing In...' : 'Sign In'}
                 </button>
               </form>
 

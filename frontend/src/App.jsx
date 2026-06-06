@@ -15,15 +15,14 @@ const AppRoutes = () => {
 
   return (
     <Routes>
+      {/* Unified login page - all users login here, routed by JWT role */}
       <Route path="/" element={<Home />} />
 
-      {/* Redirect unified Login route to Home page */}
-      <Route path="/login" element={<Navigate to="/" replace />} />
-
       {/* Redirect old login routes to unified login */}
-      <Route path="/admin-login" element={<Navigate to="/login" replace />} />
-      <Route path="/teacher-login" element={<Navigate to="/login" replace />} />
-      <Route path="/student-login" element={<Navigate to="/login" replace />} />
+      <Route path="/login" element={<Navigate to="/" replace />} />
+      <Route path="/admin-login" element={<Navigate to="/" replace />} />
+      <Route path="/teacher-login" element={<Navigate to="/" replace />} />
+      <Route path="/student-login" element={<Navigate to="/" replace />} />
 
       {/* Protected Dashboard routes */}
       <Route path="/admin-dashboard/:tab?" element={
