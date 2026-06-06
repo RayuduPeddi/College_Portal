@@ -36,11 +36,11 @@ const Login = () => {
       // Redirect automatically based on role
       const role = result.data.user.role;
       if (role === 'admin') {
-        navigate('/admin-dashboard', { replace: true });
+        navigate('/admin-dashboard');
       } else if (role === 'teacher') {
-        navigate('/teacher-dashboard', { replace: true });
+        navigate('/teacher-dashboard');
       } else if (role === 'student') {
-        navigate('/student-dashboard', { replace: true });
+        navigate('/student-dashboard');
       } else {
         setError('Unknown user role. Contact administrator.');
       }

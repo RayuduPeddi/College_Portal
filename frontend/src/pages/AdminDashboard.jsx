@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import Chat from '../components/Chat';
@@ -11,10 +12,28 @@ import '../styles/AdminDashboard.css';
 
 // Admin Dashboard Component
 const AdminDashboard = () => {
+  const navigate = useNavigate();
+  const { tab } = useParams();
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState(tab || 'dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    if (tab) {
+      setActiveTab(tab);
+    } else {
+      setActiveTab('dashboard');
+    }
+  }, [tab]);
+
+  const navigateToTab = (tabId) => {
+    if (tabId === 'dashboard') {
+      navigate('/admin-dashboard');
+    } else {
+      navigate(`/admin-dashboard/${tabId}`);
+    }
+  };
 
   const [socket, setSocket] = useState(null);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -644,7 +663,7 @@ const AdminDashboard = () => {
         role="admin" 
         activeTab={activeTab} 
         setActiveTab={(tab) => {
-          setActiveTab(tab);
+          navigateToTab(tab);
           setSidebarOpen(false);
         }} 
         menuItems={menuItems} 
@@ -670,28 +689,34 @@ const AdminDashboard = () => {
               setSidebarCollapsed(!sidebarCollapsed);
             }
           }}
-          setActiveTab={setActiveTab}
+          setActiveTab={navigateToTab}
         />
-        
+
         <div className="dashboard-content" onScroll={handleScroll}>
           <div className="dashboard-tab-content-wrapper">
-          
-          {/* Dashboard Hub View */}
-          {activeTab === 'dashboard' && (
-            <div>
-              <h2>Admin Dashboard</h2>
-              <div className="stats-container">
-                <div className="stat-card card-shadow">
-                  <h3>Total Students</h3>
-                  <p className="stat-number">{students.length}</p>
-                </div>
-                <div className="stat-card card-shadow">
-                  <h3>Total Teachers</h3>
-                  <p className="stat-number">{teachers.length}</p>
+            {activeTab === 'dashboard' && (
+              <div className="admin-dashboard-overview">
+                <h2>Dashboard Overview</h2>
+                <div className="stats-grid">
+                  <div className="stat-card card-shadow">
+                    <h3>Total Students</h3>
+                    <p className="stat-number">{students.length}</p>
+                  </div>
+                  <div className="stat-card card-shadow">
+                    <h3>Total Teachers</h3>
+                    <p className="stat-number">{teachers.length}</p>
+                  </div>
+                  <div className="stat-card card-shadow">
+                    <h3>Unseen Notices</h3>
+                    <p className="stat-number">{unseenNotices}</p>
+                  </div>
+                  <div className="stat-card card-shadow">
+                    <h3>Unresolved Complaints</h3>
+                    <p className="stat-number">{unseenComplaints}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
           {/* Profile View */}
           {activeTab === 'profile' && (

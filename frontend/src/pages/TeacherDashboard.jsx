@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import Chat from '../components/Chat';
@@ -11,10 +12,28 @@ import '../styles/TeacherDashboard.css';
 
 // Teacher Dashboard Component
 const TeacherDashboard = () => {
+  const navigate = useNavigate();
+  const { tab } = useParams();
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
-  const [activeTab, setActiveTab] = useState('profile');
+  const [activeTab, setActiveTab] = useState(tab || 'profile');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    if (tab) {
+      setActiveTab(tab);
+    } else {
+      setActiveTab('profile');
+    }
+  }, [tab]);
+
+  const navigateToTab = (tabId) => {
+    if (tabId === 'profile') {
+      navigate('/teacher-dashboard');
+    } else {
+      navigate(`/teacher-dashboard/${tabId}`);
+    }
+  };
 
   const [socket, setSocket] = useState(null);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -447,7 +466,7 @@ const TeacherDashboard = () => {
         role="teacher" 
         activeTab={activeTab} 
         setActiveTab={(tab) => {
-          setActiveTab(tab);
+          navigateToTab(tab);
           setSidebarOpen(false);
         }} 
         menuItems={menuItems} 
@@ -473,45 +492,46 @@ const TeacherDashboard = () => {
               setSidebarCollapsed(!sidebarCollapsed);
             }
           }}
-          setActiveTab={setActiveTab}
+          setActiveTab={navigateToTab}
         />
 
         <div className="dashboard-content" onScroll={handleScroll}>
           <div className="dashboard-tab-content-wrapper">
 
-          {/* Profile View */}
-          {activeTab === 'profile' && (
-            <div className="tab-section">
-              <h2>My Profile</h2>
-              <div className="profile-card card-shadow outline-teacher">
-                <div className="profile-pic-container">
-                  <img 
-                    src={getProfilePictureUrl()} 
-                    alt="Profile" 
-                    className="profile-avatar-large" 
-                  />
-                  <div className="profile-pic-upload-overlay">
-                    <input 
-                      type="file" 
-                      id="teacher-pic-input" 
-                      style={{ display: 'none' }} 
-                      accept="image/*" 
-                      onChange={handleProfilePictureUpload}
+            {/* Teacher Profile View */}
+            {activeTab === 'profile' && (
+              <div className="teacher-profile-wrapper">
+                <h2>Welcome back, {user.name}!</h2>
+                <div className="teacher-profile-card card-shadow outline-teacher">
+                  <h3>My Profile</h3>
+                  <div className="profile-pic-container">
+                    <img 
+                      src={getProfilePictureUrl()} 
+                      alt="Profile" 
+                      className="profile-avatar-large" 
                     />
-                    <label htmlFor="teacher-pic-input" className="profile-pic-upload-label">
-                      Update Avatar
-                    </label>
+                    <div className="profile-pic-upload-overlay">
+                      <input 
+                        type="file" 
+                        id="teacher-pic-input" 
+                        style={{ display: 'none' }} 
+                        accept="image/*" 
+                        onChange={handleProfilePictureUpload}
+                      />
+                      <label htmlFor="teacher-pic-input" className="profile-pic-upload-label">
+                        Update Avatar
+                      </label>
+                    </div>
+                  </div>
+                  <div className="profile-details" style={{ marginTop: '20px' }}>
+                    <p><strong>Name:</strong> {profile.userId?.name}</p>
+                    <p><strong>Email:</strong> {profile.userId?.email}</p>
+                    <p><strong>Subject:</strong> {profile.subject}</p>
+                    <p><strong>Department:</strong> {profile.department}</p>
                   </div>
                 </div>
-                <div className="profile-details" style={{ marginTop: '20px' }}>
-                  <p><strong>Name:</strong> {profile.userId?.name}</p>
-                  <p><strong>Email:</strong> {profile.userId?.email}</p>
-                  <p><strong>Subject:</strong> {profile.subject}</p>
-                  <p><strong>Department:</strong> {profile.department}</p>
-                </div>
               </div>
-            </div>
-          )}
+            )}
 
           {/* All Students View */}
           {activeTab === 'students' && (

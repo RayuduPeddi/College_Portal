@@ -38,8 +38,8 @@ const StudentLogin = () => {
       localStorage.setItem('token', result.data.token);
       localStorage.setItem('user', JSON.stringify(result.data.user));
 
-      // Redirect to the dashboard and remove login from history
-      navigate('/student-dashboard', { replace: true });
+      // Redirect to the dashboard
+      navigate('/student-dashboard');
 
     } catch (err) {
       setError('Network error. Please try again later.');

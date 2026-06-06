@@ -44,11 +44,11 @@ const Home = () => {
       localStorage.setItem('user', JSON.stringify(result.data.user));
 
       if (userRole === 'admin') {
-        navigate('/admin-dashboard', { replace: true });
+        navigate('/admin-dashboard');
       } else if (userRole === 'teacher') {
-        navigate('/teacher-dashboard', { replace: true });
+        navigate('/teacher-dashboard');
       } else if (userRole === 'student') {
-        navigate('/student-dashboard', { replace: true });
+        navigate('/student-dashboard');
       } else {
         setError('Unknown user role. Contact administrator.');
       }

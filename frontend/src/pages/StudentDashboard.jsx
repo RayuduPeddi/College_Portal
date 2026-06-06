@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import Chat from '../components/Chat';
@@ -9,10 +10,28 @@ import '../styles/StudentDashboard.css';
 
 // Student Dashboard Component
 const StudentDashboard = () => {
+  const navigate = useNavigate();
+  const { tab } = useParams();
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState(tab || 'dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    if (tab) {
+      setActiveTab(tab);
+    } else {
+      setActiveTab('dashboard');
+    }
+  }, [tab]);
+
+  const navigateToTab = (tabId) => {
+    if (tabId === 'dashboard') {
+      navigate('/student-dashboard');
+    } else {
+      navigate(`/student-dashboard/${tabId}`);
+    }
+  };
 
   const [socket, setSocket] = useState(null);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -305,7 +324,7 @@ const StudentDashboard = () => {
         role="student" 
         activeTab={activeTab} 
         setActiveTab={(tab) => {
-          setActiveTab(tab);
+          navigateToTab(tab);
           setSidebarOpen(false);
         }} 
         menuItems={menuItems} 
@@ -319,38 +338,37 @@ const StudentDashboard = () => {
       
       <div className="main-content-area">
         <Navbar 
-          role="student" 
-          userName={user.name} 
-          userProfilePicture={user.profilePicture}
-          unreadCount={unreadCount}
-          unseenMaterials={unseenMaterials}
-          onMenuToggle={() => {
-            if (window.innerWidth <= 768) {
-              setSidebarOpen(!sidebarOpen);
-            } else {
-              setSidebarCollapsed(!sidebarCollapsed);
-            }
-          }}
-          setActiveTab={setActiveTab}
-        />
-        
-        <div className="dashboard-content" onScroll={handleScroll}>
-          <div className="dashboard-tab-content-wrapper">
+            role="student" 
+            userName={user.name} 
+            userProfilePicture={user.profilePicture}
+            unreadCount={unreadCount}
+            unseenMaterials={unseenMaterials}
+            onMenuToggle={() => {
+              if (window.innerWidth <= 768) {
+                setSidebarOpen(!sidebarOpen);
+              } else {
+                setSidebarCollapsed(!sidebarCollapsed);
+              }
+            }}
+            setActiveTab={navigateToTab}
+          />
 
-          {/* Main Dashboard & Profile View */}
-          {activeTab === 'dashboard' && (
-            <div>
-              <h2>Welcome back, {user.name}!</h2>
-              
-              <div className="student-stats-container">
-                <div className="student-stat-card card-shadow outline-student">
-                  <h3>Overall Attendance</h3>
-                  <div className="stat-percentage">
-                    <span>{calculateAttendancePercentage()}%</span>
+          <div className="dashboard-content" onScroll={handleScroll}>
+            <div className="dashboard-tab-content-wrapper">
+
+            {/* Main Dashboard & Profile View */}
+            {activeTab === 'dashboard' && (
+              <div>
+                <h2>Welcome back, {user.name}!</h2>
+
+                <div className="student-stats-container">
+                  <div className="student-stat-card card-shadow outline-student">
+                    <h3>Overall Attendance</h3>
+                    <div className="stat-percentage">
+                      <span>{calculateAttendancePercentage()}%</span>
+                    </div>
+                    <p className="stat-detail">Based on {attendance.length} total sessions</p>
                   </div>
-                  <p className="stat-detail">Based on {attendance.length} total sessions</p>
-                </div>
-
                 <div className="student-profile-card card-shadow outline-student">
                   <h3>My Profile</h3>
                   <div className="profile-pic-container">

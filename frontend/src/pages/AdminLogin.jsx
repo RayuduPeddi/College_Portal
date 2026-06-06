@@ -47,8 +47,8 @@ const AdminLogin = () => {
       localStorage.setItem('token', result.data.token);
       localStorage.setItem('user', JSON.stringify(result.data.user));
 
-      // Redirect to the dashboard and replace history entry
-      navigate('/admin-dashboard', { replace: true });
+      // Redirect to the dashboard
+      navigate('/admin-dashboard');
 
     } catch (err) {
       setError('Network error. Please try again later.');

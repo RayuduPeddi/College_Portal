@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
+import useHistoryBack from './hooks/useHistoryBack';
 
 // Import Pages
 import Home from './pages/Home';
@@ -9,7 +10,43 @@ import AdminDashboard from './pages/AdminDashboard';
 import TeacherDashboard from './pages/TeacherDashboard';
 import StudentDashboard from './pages/StudentDashboard';
 
-// Main Application Component
+const AppRoutes = () => {
+  useHistoryBack();
+
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+
+      {/* Redirect unified Login route to Home page */}
+      <Route path="/login" element={<Navigate to="/" replace />} />
+
+      {/* Redirect old login routes to unified login */}
+      <Route path="/admin-login" element={<Navigate to="/login" replace />} />
+      <Route path="/teacher-login" element={<Navigate to="/login" replace />} />
+      <Route path="/student-login" element={<Navigate to="/login" replace />} />
+
+      {/* Protected Dashboard routes */}
+      <Route path="/admin-dashboard/:tab?" element={
+        <ProtectedRoute requiredRole="admin">
+          <AdminDashboard />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/teacher-dashboard/:tab?" element={
+        <ProtectedRoute requiredRole="teacher">
+          <TeacherDashboard />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/student-dashboard/:tab?" element={
+        <ProtectedRoute requiredRole="student">
+          <StudentDashboard />
+        </ProtectedRoute>
+      } />
+    </Routes>
+  );
+};
+
 function App() {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', 'light');
@@ -17,37 +54,7 @@ function App() {
 
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        
-        {/* Redirect unified Login route to Home page */}
-        <Route path="/login" element={<Navigate to="/" replace />} />
-        
-        {/* Redirect old login routes to unified login */}
-        <Route path="/admin-login" element={<Navigate to="/login" replace />} />
-        <Route path="/teacher-login" element={<Navigate to="/login" replace />} />
-        <Route path="/student-login" element={<Navigate to="/login" replace />} />
-
-        {/* Protected Dashboard routes */}
-        <Route path="/admin-dashboard" element={
-          <ProtectedRoute requiredRole="admin">
-            <AdminDashboard />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/teacher-dashboard" element={
-          <ProtectedRoute requiredRole="teacher">
-            <TeacherDashboard />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/student-dashboard" element={
-          <ProtectedRoute requiredRole="student">
-            <StudentDashboard />
-          </ProtectedRoute>
-        } />
-
-      </Routes>
+      <AppRoutes />
     </Router>
   );
 }
