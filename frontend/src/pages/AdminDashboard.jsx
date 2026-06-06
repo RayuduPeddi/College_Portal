@@ -705,12 +705,8 @@ const AdminDashboard = () => {
                     <p className="stat-number">{teachers.length}</p>
                   </div>
                   <div className="stat-card card-shadow">
-                    <h3>Unseen Notices</h3>
-                    <p className="stat-number">{unseenNotices}</p>
-                  </div>
-                  <div className="stat-card card-shadow">
                     <h3>Unresolved Complaints</h3>
-                    <p className="stat-number">{unseenComplaints}</p>
+                    <p className="stat-number">{complaints.filter(c => c.status !== 'Resolved').length}</p>
                   </div>
                 </div>
               </div>
