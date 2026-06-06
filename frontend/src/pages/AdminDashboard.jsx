@@ -302,16 +302,14 @@ const AdminDashboard = () => {
       alert('Please select a file to upload.');
       return;
     }
-    if (!newMaterial.year || !newMaterial.semester || !newMaterial.subject) {
-      alert('Please select Year, Semester, and Subject.');
+    if (!newMaterial.title || !newMaterial.subject) {
+      alert('Please enter a Title and select a Subject.');
       return;
     }
     const formData = new FormData();
     formData.append('title', newMaterial.title);
     formData.append('description', newMaterial.description);
     formData.append('subject', newMaterial.subject);
-    formData.append('year', newMaterial.year);
-    formData.append('semester', newMaterial.semester);
     formData.append('file', materialFile);
 
     setMaterialUploading(true);
@@ -324,7 +322,7 @@ const AdminDashboard = () => {
       const result = await res.json();
       if (result.success) {
         alert('Material uploaded successfully!');
-        setNewMaterial({ title: '', description: '', subject: '', year: '', semester: '' });
+        setNewMaterial({ title: '', description: '', subject: '' });
         setMaterialFile(null);
         const fileInput = document.getElementById('admin-material-file');
         if (fileInput) fileInput.value = '';
