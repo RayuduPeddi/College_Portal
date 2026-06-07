@@ -13,7 +13,8 @@ const Navbar = ({ role, userName, userProfilePicture, onMenuToggle, setActiveTab
   const [confirmPassword, setConfirmPassword] = useState('');
   const [pwdError, setPwdError] = useState('');
   const [pwdSuccess, setPwdSuccess] = useState('');
-  
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
 
 
   useEffect(() => {
@@ -29,8 +30,8 @@ const Navbar = ({ role, userName, userProfilePicture, onMenuToggle, setActiveTab
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     navigate('/');
   };
 
@@ -113,7 +114,7 @@ const Navbar = ({ role, userName, userProfilePicture, onMenuToggle, setActiveTab
             ☰
           </button>
         </div>
-        
+
         <div className="navbar-right">
           <div className="navbar-quick-actions">
             <button className="navbar-action-btn" onClick={() => setActiveTab('chat')} title="Live Chat">
@@ -138,7 +139,7 @@ const Navbar = ({ role, userName, userProfilePicture, onMenuToggle, setActiveTab
               {unseenMaterials > 0 && <span className="navbar-action-badge">{unseenMaterials}</span>}
             </button>
           </div>
-          
+
           <div className="navbar-profile-container">
             <button className="navbar-profile-trigger" onClick={toggleDropdown}>
               <span className="navbar-profile-icon" style={{ display: 'flex', alignItems: 'center' }}>
@@ -147,7 +148,7 @@ const Navbar = ({ role, userName, userProfilePicture, onMenuToggle, setActiveTab
               <span className="user-name">{userName || 'User'}</span>
               <span className="dropdown-caret">▼</span>
             </button>
-            
+
             {dropdownOpen && (
               <div className="navbar-dropdown-menu">
                 <div className="dropdown-user-header">
@@ -164,7 +165,7 @@ const Navbar = ({ role, userName, userProfilePicture, onMenuToggle, setActiveTab
                 </button>
 
                 <div className="dropdown-divider"></div>
-                <button className="dropdown-item logout" onClick={handleLogout}>
+                <button className="dropdown-item logout" onClick={() => setShowLogoutModal(true)}>
                   🚪 Logout
                 </button>
               </div>
@@ -172,6 +173,8 @@ const Navbar = ({ role, userName, userProfilePicture, onMenuToggle, setActiveTab
           </div>
         </div>
       </nav>
+
+
       {changePwdOpen && (
         <div className="change-password-modal-overlay" role="dialog" aria-modal="true">
           <div className="change-password-modal-card">
@@ -202,6 +205,49 @@ const Navbar = ({ role, userName, userProfilePicture, onMenuToggle, setActiveTab
           </div>
         </div>
       )}
+
+      {showLogoutModal && (
+  <div
+    className="change-password-modal-overlay"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div className="change-password-modal-card">
+      <div className="modal-header">
+        <h3>Confirm Logout</h3>
+        <button
+          className="modal-close-btn"
+          onClick={() => setShowLogoutModal(false)}
+        >
+          ✕
+        </button>
+      </div>
+
+      <div style={{ padding: '20px' }}>
+        <p>Are you sure you want to logout?</p>
+
+        <div className="modal-actions">
+          <button
+            type="button"
+            className="modal-cancel-btn"
+            onClick={() => setShowLogoutModal(false)}
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            className="modal-save-btn"
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
     </>
   );
 };
