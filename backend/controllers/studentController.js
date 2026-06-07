@@ -70,6 +70,30 @@ const getMyComplaints = async (req, res) => {
   }
 };
 
+const deleteComplaint = async (req, res) => {
+  try {
+    const complaint = await Complaint.findByIdAndDelete(req.params.id);
+
+    if (!complaint) {
+      return res.status(404).json({
+        success: false,
+        message: 'Complaint not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Complaint deleted successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+}
+
+
 const getMaterials = async (req, res) => {
   try {
     const materials = await Material.find().populate('uploadedBy', 'name email role').sort({ date: -1 });
@@ -86,6 +110,7 @@ module.exports = {
   getAllNotices,
   createComplaint,
   getMyComplaints,
+  deleteComplaint,
   getMaterials
 };
 

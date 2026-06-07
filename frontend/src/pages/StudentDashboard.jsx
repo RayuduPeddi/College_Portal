@@ -264,6 +264,32 @@ const StudentDashboard = () => {
     } catch (err) { console.log(err); }
   };
 
+  const handleDelete = async (id) => {
+  try {
+    const res = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/student/complaints/${id}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    const result = await res.json();
+
+    if (result.success) {
+      alert('Complaint withdrawn successfully');
+
+      setComplaints(prev =>
+        prev.filter(c => c._id !== id)
+      );
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
   const handleProfilePictureUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -488,7 +514,9 @@ const StudentDashboard = () => {
                         <td data-label="Subject">{c.subject}</td>
                         <td data-label="Description">{c.description}</td>
                         <td data-label="Status"><span className={`status-badge ${c.status?.toLowerCase()}`}>{c.status}</span></td>
+                       <button className="action-btn" onClick={() => handleDelete(c._id)} >Withdraw</button>
                       </tr>
+
                     ))}
                     {complaints.length === 0 && <tr><td colSpan="4">No complaints raised yet.</td></tr>}
                   </tbody>

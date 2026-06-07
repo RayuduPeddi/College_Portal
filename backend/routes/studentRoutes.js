@@ -20,6 +20,7 @@ router.get('/marks', studentController.getMyMarks);
 router.get('/notices', studentController.getAllNotices);
 router.post('/complaints', studentController.createComplaint);
 router.get('/complaints', studentController.getMyComplaints);
+router.delete('/complaints/:id', studentController.deleteComplaint);
 
 // Study Materials route
 router.get('/materials', studentController.getMaterials);
