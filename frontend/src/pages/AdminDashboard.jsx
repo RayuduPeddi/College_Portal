@@ -69,11 +69,28 @@ const AdminDashboard = () => {
   const [editProfileName, setEditProfileName] = useState('');
   const [editProfileEmail, setEditProfileEmail] = useState('');
 
+  // Helper to generate a random password
+  const generateRandomPassword = (length = 8) => {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let pwd = '';
+    for (let i = 0; i < length; i++) {
+      pwd += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return pwd;
+  };
+
   // Form states for adding Student
-  const [newStudent, setNewStudent] = useState({ name: '', email: '', rollNo: '', department: '' });
+  const [newStudent, setNewStudent] = useState({ name: '', email: '', rollNo: '', department: '', password: generateRandomPassword() });
   
   // Form states for adding Teacher
-  const [newTeacher, setNewTeacher] = useState({ name: '', email: '', subject: '', department: '' });
+  const [newTeacher, setNewTeacher] = useState({ name: '', email: '', subject: '', department: '', password: generateRandomPassword() });
+
+  // Filtering and Notice Editing states
+  const [selectedDepartment, setSelectedDepartment] = useState('All');
+  const [selectedReportDept, setSelectedReportDept] = useState('All');
+  const [editingNoticeId, setEditingNoticeId] = useState(null);
+  const [editNoticeTitle, setEditNoticeTitle] = useState('');
+  const [editNoticeContent, setEditNoticeContent] = useState('');
 
   const [notices, setNotices] = useState([]);
   const [complaints, setComplaints] = useState([]);
@@ -135,6 +152,7 @@ const AdminDashboard = () => {
     { id: 'students', label: 'Manage Students', icon: <StudentsIcon size={20} color="currentColor" /> },
     { id: 'teachers', label: 'Manage Teachers', icon: <TeachersIcon size={20} color="currentColor" /> },
     { id: 'records', label: 'Student Records', icon: <FolderIcon size={20} color="currentColor" /> },
+    { id: 'reports', label: 'Reports', icon: <FolderIcon size={20} color="currentColor" /> },
     { id: 'notices', label: 'Manage Notices', icon: <NoticesIcon size={20} color="currentColor" />, badge: unseenNotices },
     { id: 'complaints', label: 'View Complaints', icon: <ComplaintsIcon size={20} color="currentColor" />, badge: unseenComplaints },
     { id: 'materials', label: 'Study Materials', icon: <MaterialsIcon size={20} color="currentColor" />, badge: unseenMaterials },
@@ -368,13 +386,14 @@ const AdminDashboard = () => {
           name: newStudent.name,
           email: newStudent.email,
           rollNo: newStudent.rollNo,
-          department: newStudent.department
+          department: newStudent.department,
+          password: newStudent.password
         })
       });
       const result = await res.json();
       if (result.success) {
         alert('Student added successfully!');
-        setNewStudent({ name: '', email: '', rollNo: '', department: '' });
+        setNewStudent({ name: '', email: '', rollNo: '', department: '', password: generateRandomPassword() });
         fetchStudents();
       } else {
         alert(result.message);
@@ -410,13 +429,14 @@ const AdminDashboard = () => {
           name: newTeacher.name,
           email: newTeacher.email,
           subject: newTeacher.subject,
-          department: newTeacher.department
+          department: newTeacher.department,
+          password: newTeacher.password
         })
       });
       const result = await res.json();
       if (result.success) {
         alert('Teacher added successfully!');
-        setNewTeacher({ name: '', email: '', subject: '', department: '' });
+        setNewTeacher({ name: '', email: '', subject: '', department: '', password: generateRandomPassword() });
         fetchTeachers();
       } else {
         alert(result.message);
@@ -598,6 +618,36 @@ const AdminDashboard = () => {
     } catch (err) { console.log(err); }
   };
 
+  const startEditNotice = (n) => {
+    setEditingNoticeId(n._id);
+    setEditNoticeTitle(n.title || '');
+    setEditNoticeContent(n.content || '');
+  };
+
+  const handleSaveNoticeEdit = async (id) => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/notices/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({
+          title: editNoticeTitle,
+          content: editNoticeContent
+        })
+      });
+      const result = await res.json();
+      if (result.success) {
+        alert('Notice updated successfully!');
+        setEditingNoticeId(null);
+        fetchNotices();
+      } else {
+        alert(result.message || 'Failed to update notice');
+      }
+    } catch (err) {
+      console.log(err);
+      alert('Error updating notice');
+    }
+  };
+
   const handleUpdateComplaintStatus = async (id, status) => {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/complaints/${id}/status`, {
@@ -655,6 +705,43 @@ const AdminDashboard = () => {
     return acc;
   }, {});
 
+  const uniqueDepartments = ['All', ...new Set(students.map(s => s.department).filter(Boolean))];
+  const filteredStudents = selectedDepartment === 'All' 
+    ? students 
+    : students.filter(s => s.department === selectedDepartment);
+
+  const allDepartments = ['All', ...new Set([
+    ...students.map(s => s.department),
+    ...teachers.map(t => t.department)
+  ].filter(Boolean))];
+
+  const reportStudents = selectedReportDept === 'All'
+    ? students
+    : students.filter(s => s.department === selectedReportDept);
+
+  const reportTeachers = selectedReportDept === 'All'
+    ? teachers
+    : teachers.filter(t => t.department === selectedReportDept);
+
+  const downloadStudentReport = () => {
+    const headers = ['Name', 'Email', 'Roll No', 'Department'];
+    const rows = reportStudents.map(s => [
+      s.userId?.name || '',
+      s.userId?.email || '',
+      s.rollNo || '',
+      s.department || ''
+    ]);
+    const csvContent = [headers, ...rows].map(e => e.map(val => `"${String(val).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `student_report_${selectedReportDept}_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="dashboard-layout">
       <Sidebar 
@@ -695,16 +782,16 @@ const AdminDashboard = () => {
             {activeTab === 'dashboard' && (
               <div className="admin-dashboard-overview">
                 <h2>Dashboard Overview</h2>
-                <div className="stats-grid">
-                  <div className="stat-card card-shadow">
+                <div className="stats-container">
+                  <div className="stat-card students card-shadow" onClick={() => navigateToTab('students')} style={{ cursor: 'pointer' }}>
                     <h3>Total Students</h3>
                     <p className="stat-number">{students.length}</p>
                   </div>
-                  <div className="stat-card card-shadow">
+                  <div className="stat-card teachers card-shadow" onClick={() => navigateToTab('teachers')} style={{ cursor: 'pointer' }}>
                     <h3>Total Teachers</h3>
                     <p className="stat-number">{teachers.length}</p>
                   </div>
-                  <div className="stat-card card-shadow">
+                  <div className="stat-card complaints card-shadow" onClick={() => navigateToTab('complaints')} style={{ cursor: 'pointer' }}>
                     <h3>Unresolved Complaints</h3>
                     <p className="stat-number">{complaints.filter(c => c.status !== 'Resolved').length}</p>
                   </div>
@@ -716,7 +803,8 @@ const AdminDashboard = () => {
           {activeTab === 'profile' && (
             <div className="tab-section">
               <h2>My Profile</h2>
-              <div className="profile-card card-shadow outline-admin" style={{ padding: '30px' }}>
+              <div className="profile-card card-shadow outline-admin">
+                <div className="profile-banner"></div>
                 <div className="profile-pic-container">
                   <img 
                     src={getProfilePictureUrl()} 
@@ -736,8 +824,9 @@ const AdminDashboard = () => {
                     </label>
                   </div>
                 </div>
-                <div className="profile-details" style={{ marginTop: '20px' }}>
-                  {isEditingProfile ? (
+                
+                {isEditingProfile ? (
+                  <div className="profile-details" style={{ marginTop: '20px', padding: '0 10px 20px 10px' }}>
                     <form onSubmit={handleSaveProfileEdit}>
                       <div className="form-group" style={{ marginBottom: '15px' }}>
                         <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Name</label>
@@ -745,7 +834,7 @@ const AdminDashboard = () => {
                           required 
                           value={editProfileName} 
                           onChange={e => setEditProfileName(e.target.value)} 
-                          style={{ width: '100%', maxWidth: '300px', margin: 0 }}
+                          style={{ width: '100%', maxWidth: '360px', margin: 0 }}
                         />
                       </div>
                       <div className="form-group" style={{ marginBottom: '15px' }}>
@@ -755,7 +844,7 @@ const AdminDashboard = () => {
                           type="email" 
                           value={editProfileEmail} 
                           onChange={e => setEditProfileEmail(e.target.value)} 
-                          style={{ width: '100%', maxWidth: '300px', margin: 0 }}
+                          style={{ width: '100%', maxWidth: '360px', margin: 0 }}
                         />
                       </div>
                       <p style={{ marginBottom: '15px' }}><strong>Role:</strong> Administrator</p>
@@ -775,21 +864,32 @@ const AdminDashboard = () => {
                         Cancel
                       </button>
                     </form>
-                  ) : (
-                    <>
-                      <p><strong>Name:</strong> {user.name}</p>
-                      <p><strong>Email:</strong> {user.email}</p>
-                      <p><strong>Role:</strong> Administrator</p>
-                      <button 
-                        onClick={startEditProfile} 
-                        className="action-btn"
-                        style={{ marginTop: '15px', backgroundColor: '#008fd2' }}
-                      >
-                        Edit Profile
-                      </button>
-                    </>
-                  )}
-                </div>
+                  </div>
+                ) : (
+                  <div style={{ textAlign: 'center', padding: '0 10px 20px 10px' }}>
+                    <div className="profile-details-grid">
+                      <div className="profile-detail-item">
+                        <label>Name</label>
+                        <div className="value">{user.name}</div>
+                      </div>
+                      <div className="profile-detail-item">
+                        <label>Email Address</label>
+                        <div className="value">{user.email}</div>
+                      </div>
+                      <div className="profile-detail-item">
+                        <label>Role</label>
+                        <div className="value">Administrator</div>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={startEditProfile} 
+                      className="action-btn"
+                      style={{ marginTop: '25px', display: 'inline-flex', margin: '25px auto 0 auto' }}
+                    >
+                      Edit Profile
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -801,13 +901,32 @@ const AdminDashboard = () => {
               <form className="add-form card-shadow" onSubmit={handleAddStudent}>
                 <input required placeholder="Name" value={newStudent.name} onChange={e => setNewStudent({...newStudent, name: e.target.value})} />
                 <input required type="email" placeholder="Email" value={newStudent.email} onChange={e => setNewStudent({...newStudent, email: e.target.value})} />
-                {/* Password is managed by users; admins cannot set passwords */}
                 <input required placeholder="Roll No" value={newStudent.rollNo} onChange={e => setNewStudent({...newStudent, rollNo: e.target.value})} />
                 <input required placeholder="Department" value={newStudent.department} onChange={e => setNewStudent({...newStudent, department: e.target.value})} />
+                <div style={{ display: 'flex', gap: '5px', flex: '1 1 220px', minWidth: '220px', maxWidth: '280px', alignItems: 'center' }}>
+                  <input required placeholder="Password" value={newStudent.password} onChange={e => setNewStudent({...newStudent, password: e.target.value})} style={{ flex: 1, margin: 0, height: '42px' }} />
+                  <button type="button" onClick={() => setNewStudent({...newStudent, password: generateRandomPassword()})} className="action-btn" style={{ minWidth: 'auto', padding: '0 12px', height: '42px', fontSize: '13px', margin: 0 }} title="Generate Random Password">
+                    Gen
+                  </button>
+                </div>
                 <button type="submit" className="action-btn">Add Student</button>
               </form>
 
-              <h2>All Students</h2>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', flexWrap: 'wrap', gap: '10px' }}>
+                <h2>All Students</h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <label style={{ fontWeight: '500', fontSize: '14px', whiteSpace: 'nowrap' }}>Filter by Dept:</label>
+                  <select 
+                    value={selectedDepartment} 
+                    onChange={e => setSelectedDepartment(e.target.value)} 
+                    style={{ margin: 0, padding: '6px 12px', width: 'auto', minWidth: '150px' }}
+                  >
+                    {uniqueDepartments.map(dept => (
+                      <option key={dept} value={dept}>{dept}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
               <div className="table-container card-shadow">
                 <table>
                   <thead>
@@ -821,7 +940,7 @@ const AdminDashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {students.map(s => (
+                    {filteredStudents.map(s => (
                       <tr key={s._id}>
                         {editingStudentId === s._id ? (
                           <>
@@ -903,9 +1022,9 @@ const AdminDashboard = () => {
                         )}
                       </tr>
                     ))}
-                    {students.length === 0 && (
+                    {filteredStudents.length === 0 && (
                       <tr>
-                        <td colSpan="5" style={{ textAlign: 'center', color: '#666', padding: '20px' }}>No students registered. Please use the form above to add a student.</td>
+                        <td colSpan="5" style={{ textAlign: 'center', color: '#666', padding: '20px' }}>No students registered under the selected department.</td>
                       </tr>
                     )}
                   </tbody>
@@ -921,7 +1040,6 @@ const AdminDashboard = () => {
               <form className="add-form card-shadow" onSubmit={handleAddTeacher}>
                 <input required placeholder="Name" value={newTeacher.name} onChange={e => setNewTeacher({...newTeacher, name: e.target.value})} />
                 <input required type="email" placeholder="Email" value={newTeacher.email} onChange={e => setNewTeacher({...newTeacher, email: e.target.value})} />
-                {/* Password is managed by users; admins cannot set passwords */}
                 <div className="searchable-select-wrapper">
                   <SearchableSelect
                     options={SUBJECTS}
@@ -932,6 +1050,12 @@ const AdminDashboard = () => {
                   />
                 </div>
                 <input required placeholder="Department" value={newTeacher.department} onChange={e => setNewTeacher({...newTeacher, department: e.target.value})} />
+                <div style={{ display: 'flex', gap: '5px', flex: '1 1 220px', minWidth: '220px', maxWidth: '280px', alignItems: 'center' }}>
+                  <input required placeholder="Password" value={newTeacher.password} onChange={e => setNewTeacher({...newTeacher, password: e.target.value})} style={{ flex: 1, margin: 0, height: '42px' }} />
+                  <button type="button" onClick={() => setNewTeacher({...newTeacher, password: generateRandomPassword()})} className="action-btn" style={{ minWidth: 'auto', padding: '0 12px', height: '42px', fontSize: '13px', margin: 0 }} title="Generate Random Password">
+                    Gen
+                  </button>
+                </div>
                 <button type="submit" className="action-btn">Add Teacher</button>
               </form>
 
@@ -1112,6 +1236,103 @@ const AdminDashboard = () => {
             </div>
           )}
 
+          {activeTab === 'reports' && (
+            <div className="tab-section">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '15px' }}>
+                <h2>Reports & Summaries</h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <label style={{ fontWeight: '500', fontSize: '14px', whiteSpace: 'nowrap' }}>Department Filter:</label>
+                  <select 
+                    value={selectedReportDept} 
+                    onChange={e => setSelectedReportDept(e.target.value)} 
+                    style={{ margin: 0, padding: '8px 16px', width: 'auto', minWidth: '180px' }}
+                  >
+                    {allDepartments.map(dept => (
+                      <option key={dept} value={dept}>{dept}</option>
+                    ))}
+                  </select>
+                  <button 
+                    onClick={downloadStudentReport} 
+                    className="action-btn"
+                    style={{ margin: 0, backgroundColor: '#10b981', display: 'flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    Download Students (CSV)
+                  </button>
+                </div>
+              </div>
+
+              {/* Summary Cards */}
+              <div className="stats-container" style={{ marginBottom: '30px' }}>
+                <div className="stat-card students card-shadow">
+                  <h3>Filtered Students ({selectedReportDept})</h3>
+                  <p className="stat-number">{reportStudents.length}</p>
+                </div>
+                <div className="stat-card teachers card-shadow">
+                  <h3>Filtered Teachers ({selectedReportDept})</h3>
+                  <p className="stat-number">{reportTeachers.length}</p>
+                </div>
+              </div>
+
+              <h3>Student Directory</h3>
+              <div className="table-container card-shadow" style={{ marginBottom: '30px' }}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Roll No</th>
+                      <th>Department</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {reportStudents.map(s => (
+                      <tr key={s._id}>
+                        <td data-label="Name">{s.userId?.name}</td>
+                        <td data-label="Email">{s.userId?.email}</td>
+                        <td data-label="Roll No">{s.rollNo}</td>
+                        <td data-label="Department">{s.department}</td>
+                      </tr>
+                    ))}
+                    {reportStudents.length === 0 && (
+                      <tr>
+                        <td colSpan="4" style={{ textAlign: 'center', color: '#666', padding: '20px' }}>No students match the selected department filter.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              <h3>Teacher Directory</h3>
+              <div className="table-container card-shadow">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Subject</th>
+                      <th>Department</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {reportTeachers.map(t => (
+                      <tr key={t._id}>
+                        <td data-label="Name">{t.userId?.name}</td>
+                        <td data-label="Email">{t.userId?.email}</td>
+                        <td data-label="Subject">{t.subject}</td>
+                        <td data-label="Department">{t.department}</td>
+                      </tr>
+                    ))}
+                    {reportTeachers.length === 0 && (
+                      <tr>
+                        <td colSpan="4" style={{ textAlign: 'center', color: '#666', padding: '20px' }}>No teachers match the selected department filter.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
           {activeTab === 'notices' && (
             <div className="tab-section">
               <h2>Post a New Notice</h2>
@@ -1128,10 +1349,65 @@ const AdminDashboard = () => {
                   <tbody>
                     {notices.map(n => (
                       <tr key={n._id}>
-                        <td data-label="Date">{new Date(n.date).toLocaleDateString()}</td>
-                        <td data-label="Title">{n.title}</td>
-                        <td data-label="Content">{n.content}</td>
-                        <td data-label="Action"><button onClick={() => handleDeleteNotice(n._id)} className="delete-btn">Delete</button></td>
+                        {editingNoticeId === n._id ? (
+                          <>
+                            <td data-label="Date">{new Date(n.date).toLocaleDateString()}</td>
+                            <td data-label="Title">
+                              <input 
+                                required 
+                                value={editNoticeTitle} 
+                                onChange={e => setEditNoticeTitle(e.target.value)} 
+                                style={{ margin: 0, padding: '6px', fontSize: '13.5px', width: '100%' }}
+                              />
+                            </td>
+                            <td data-label="Content">
+                              <textarea 
+                                required 
+                                value={editNoticeContent} 
+                                onChange={e => setEditNoticeContent(e.target.value)} 
+                                style={{ margin: 0, padding: '6px', fontSize: '13.5px', width: '100%', minHeight: '60px' }}
+                              />
+                            </td>
+                            <td data-label="Action">
+                              <button 
+                                onClick={() => handleSaveNoticeEdit(n._id)} 
+                                className="action-btn"
+                                style={{ padding: '6px 12px', minWidth: 'auto', display: 'inline-block', marginRight: '5px', fontSize: '13px', height: 'auto' }}
+                              >
+                                Save
+                              </button>
+                              <button 
+                                onClick={() => setEditingNoticeId(null)} 
+                                className="delete-btn"
+                                style={{ padding: '6px 12px', minWidth: 'auto', display: 'inline-block', backgroundColor: '#666', fontSize: '13px', height: 'auto' }}
+                              >
+                                Cancel
+                              </button>
+                            </td>
+                          </>
+                        ) : (
+                          <>
+                            <td data-label="Date">{new Date(n.date).toLocaleDateString()}</td>
+                            <td data-label="Title">{n.title}</td>
+                            <td data-label="Content">{n.content}</td>
+                            <td data-label="Action">
+                              <button 
+                                onClick={() => startEditNotice(n)} 
+                                className="action-btn" 
+                                style={{ padding: '6px 12px', minWidth: 'auto', display: 'inline-block', marginRight: '5px', fontSize: '13px', backgroundColor: '#008fd2', height: 'auto' }}
+                              >
+                                Edit
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteNotice(n._id)} 
+                                className="delete-btn"
+                                style={{ padding: '6px 12px', minWidth: 'auto', display: 'inline-block', fontSize: '13px', height: 'auto' }}
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </>
+                        )}
                       </tr>
                     ))}
                     {notices.length === 0 && (

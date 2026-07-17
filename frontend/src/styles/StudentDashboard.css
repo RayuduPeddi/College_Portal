@@ -46,42 +46,12 @@
   font-size: 14px;
 }
 
-.student-profile-card {
-  flex: 1;
-  padding: 30px;
-}
-
-.student-profile-card h3 {
-  color: #444;
-  margin-bottom: 20px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
-}
-
-.profile-details p {
-  font-size: 16px;
-  margin-bottom: 15px;
-  color: #555;
-}
-
-.profile-details strong {
-  display: inline-block;
-  width: 120px;
-  color: var(--primary-color);
-}
-
 @media (max-width: 768px) {
   .student-stats-container {
     flex-direction: column;
   }
-  .student-stat-card,
-  .student-profile-card {
+  .student-stat-card {
     width: 100%;
     padding: 20px;
-  }
-  .profile-details strong {
-    display: block;
-    width: 100%;
-    margin-bottom: 6px;
   }
 }

@@ -388,44 +388,59 @@ const StudentDashboard = () => {
                 <h2>Welcome back, {user.name}!</h2>
 
                 <div className="student-stats-container">
-                  <div className="student-stat-card card-shadow outline-student">
+                  <div className="student-stat-card card-shadow outline-student" style={{ padding: '30px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                     <h3>Overall Attendance</h3>
-                    <div className="stat-percentage">
+                    <div className="stat-percentage" style={{ margin: '20px auto' }}>
                       <span>{calculateAttendancePercentage()}%</span>
                     </div>
                     <p className="stat-detail">Based on {attendance.length} total sessions</p>
                   </div>
-                <div className="student-profile-card card-shadow outline-student">
-                  <h3>My Profile</h3>
-                  <div className="profile-pic-container">
-                    <img 
-                      src={getProfilePictureUrl()} 
-                      alt="Profile" 
-                      className="profile-avatar-large" 
-                    />
-                    <div className="profile-pic-upload-overlay">
-                      <input 
-                        type="file" 
-                        id="student-pic-input" 
-                        style={{ display: 'none' }} 
-                        accept="image/*" 
-                        onChange={handleProfilePictureUpload}
+
+                  <div className="profile-card card-shadow outline-student" style={{ margin: 0, flex: 1.5 }}>
+                    <div className="profile-banner"></div>
+                    <div className="profile-pic-container">
+                      <img 
+                        src={getProfilePictureUrl()} 
+                        alt="Profile" 
+                        className="profile-avatar-large" 
                       />
-                      <label htmlFor="student-pic-input" className="profile-pic-upload-label">
-                        Update Avatar
-                      </label>
+                      <div className="profile-pic-upload-overlay">
+                        <input 
+                          type="file" 
+                          id="student-pic-input" 
+                          style={{ display: 'none' }} 
+                          accept="image/*" 
+                          onChange={handleProfilePictureUpload}
+                        />
+                        <label htmlFor="student-pic-input" className="profile-pic-upload-label">
+                          Update Avatar
+                        </label>
+                      </div>
                     </div>
-                  </div>
-                  <div className="profile-details">
-                    <p><strong>Name:</strong> {profile.userId?.name}</p>
-                    <p><strong>Email:</strong> {profile.userId?.email}</p>
-                    <p><strong>Roll No:</strong> {profile.rollNo}</p>
-                    <p><strong>Department:</strong> {profile.department}</p>
+                    <div style={{ textAlign: 'center', padding: '0 10px 20px 10px' }}>
+                      <div className="profile-details-grid" style={{ marginTop: '20px' }}>
+                        <div className="profile-detail-item">
+                          <label>Name</label>
+                          <div className="value">{profile.userId?.name}</div>
+                        </div>
+                        <div className="profile-detail-item">
+                          <label>Email Address</label>
+                          <div className="value">{profile.userId?.email}</div>
+                        </div>
+                        <div className="profile-detail-item">
+                          <label>Roll No</label>
+                          <div className="value">{profile.rollNo}</div>
+                        </div>
+                        <div className="profile-detail-item">
+                          <label>Department</label>
+                          <div className="value">{profile.department}</div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
           {/* Attendance Records View */}
           {activeTab === 'attendance' && (

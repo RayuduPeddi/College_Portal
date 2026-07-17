@@ -64,6 +64,7 @@ const TeacherDashboard = () => {
   const [isDragging, setIsDragging] = useState(false);
 
   // Search and accordion states
+  const [selectedDepartment, setSelectedDepartment] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedSubjects, setExpandedSubjects] = useState({});
 
@@ -460,6 +461,11 @@ const TeacherDashboard = () => {
     return acc;
   }, {});
 
+  const uniqueDepartments = ['All', ...new Set(students.map(s => s.department).filter(Boolean))];
+  const filteredStudents = selectedDepartment === 'All' 
+    ? students 
+    : students.filter(s => s.department === selectedDepartment);
+
   return (
     <div className="dashboard-layout">
       <Sidebar 
@@ -502,8 +508,8 @@ const TeacherDashboard = () => {
             {activeTab === 'profile' && (
               <div className="teacher-profile-wrapper">
                 <h2>Welcome back, {user.name}!</h2>
-                <div className="teacher-profile-card card-shadow outline-teacher">
-                  <h3>My Profile</h3>
+                <div className="profile-card card-shadow outline-teacher" style={{ margin: '20px auto 0 auto' }}>
+                  <div className="profile-banner"></div>
                   <div className="profile-pic-container">
                     <img 
                       src={getProfilePictureUrl()} 
@@ -523,11 +529,25 @@ const TeacherDashboard = () => {
                       </label>
                     </div>
                   </div>
-                  <div className="profile-details" style={{ marginTop: '20px' }}>
-                    <p><strong>Name:</strong> {profile.userId?.name}</p>
-                    <p><strong>Email:</strong> {profile.userId?.email}</p>
-                    <p><strong>Subject:</strong> {profile.subject}</p>
-                    <p><strong>Department:</strong> {profile.department}</p>
+                  <div style={{ textAlign: 'center', padding: '0 10px 20px 10px' }}>
+                    <div className="profile-details-grid" style={{ marginTop: '20px' }}>
+                      <div className="profile-detail-item">
+                        <label>Name</label>
+                        <div className="value">{profile.userId?.name}</div>
+                      </div>
+                      <div className="profile-detail-item">
+                        <label>Email Address</label>
+                        <div className="value">{profile.userId?.email}</div>
+                      </div>
+                      <div className="profile-detail-item">
+                        <label>Subject</label>
+                        <div className="value">{profile.subject}</div>
+                      </div>
+                      <div className="profile-detail-item">
+                        <label>Department</label>
+                        <div className="value">{profile.department}</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -536,14 +556,28 @@ const TeacherDashboard = () => {
           {/* All Students View */}
           {activeTab === 'students' && (
             <div className="tab-section">
-              <h2>All Students List</h2>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', flexWrap: 'wrap', gap: '10px' }}>
+                <h2>All Students List</h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <label style={{ fontWeight: '500', fontSize: '14px', whiteSpace: 'nowrap' }}>Filter by Dept:</label>
+                  <select 
+                    value={selectedDepartment} 
+                    onChange={e => setSelectedDepartment(e.target.value)} 
+                    style={{ margin: 0, padding: '6px 12px', width: 'auto', minWidth: '150px' }}
+                  >
+                    {uniqueDepartments.map(dept => (
+                      <option key={dept} value={dept}>{dept}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
               <div className="table-container card-shadow outline-teacher">
                 <table>
                   <thead>
                     <tr><th>Name</th><th>Email</th><th>Roll No</th><th>Department</th></tr>
                   </thead>
                   <tbody>
-                    {students.map(s => (
+                    {filteredStudents.map(s => (
                       <tr key={s._id}>
                         <td data-label="Name">{s.userId?.name}</td>
                         <td data-label="Email">{s.userId?.email}</td>
@@ -551,9 +585,9 @@ const TeacherDashboard = () => {
                         <td data-label="Department">{s.department}</td>
                       </tr>
                     ))}
-                    {students.length === 0 && (
+                    {filteredStudents.length === 0 && (
                       <tr>
-                        <td colSpan="4" style={{ textAlign: 'center', color: '#666', padding: '20px' }}>No students are registered in the portal yet.</td>
+                        <td colSpan="4" style={{ textAlign: 'center', color: '#666', padding: '20px' }}>No students registered under the selected department.</td>
                       </tr>
                     )}
                   </tbody>

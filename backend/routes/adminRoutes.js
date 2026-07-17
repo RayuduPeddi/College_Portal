@@ -51,6 +51,7 @@ router.get('/marks/:studentId', adminController.getStudentMarks);
 
 router.get('/notices', adminController.getAllNotices);
 router.post('/notices', adminController.createNotice);
+router.put('/notices/:id', adminController.updateNotice);
 router.delete('/notices/:id', adminController.deleteNotice);
 
 router.get('/complaints', adminController.getAllComplaints);

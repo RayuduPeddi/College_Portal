@@ -20,7 +20,7 @@ const getAllStudents = async (req, res) => {
 
 const addStudent = async (req, res) => {
   try {
-    const { name, email, rollNo, department } = req.body;
+    const { name, email, rollNo, department, password } = req.body;
 
     if (!name || !email || !rollNo || !department) {
       return res.status(400).json({ success: false, message: 'All fields are required (Name, Email, Roll No, Department)' });
@@ -36,9 +36,9 @@ const addStudent = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Roll Number already exists in the system' });
     }
 
-    // Generate a temporary random password server-side — admin cannot choose the password
-    const tempPassword = crypto.randomBytes(8).toString('hex');
-    const hashedPassword = await bcrypt.hash(tempPassword, 10);
+    // Use admin-assigned password if provided, otherwise generate a random password
+    const plainPassword = password || crypto.randomBytes(8).toString('hex');
+    const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
     const newUser = new User({
       name,
@@ -55,9 +55,13 @@ const addStudent = async (req, res) => {
     });
     const savedStudent = await newStudent.save();
 
-    // Note: we do not return the temporary password in API response for security.
+    // Send email with login credentials
+    const { sendWelcomeEmail } = require('../utils/emailService');
+    await sendWelcomeEmail(email, name, 'student', plainPassword);
+
     res.json({ success: true, data: savedStudent });
   } catch (error) {
+    console.error('Error adding student:', error);
     res.status(500).json({ success: false, message: 'Error adding student' });
   }
 };
@@ -92,7 +96,7 @@ const getAllTeachers = async (req, res) => {
 
 const addTeacher = async (req, res) => {
   try {
-    const { name, email, subject, department } = req.body;
+    const { name, email, subject, department, password } = req.body;
 
     if (!name || !email || !subject || !department) {
       return res.status(400).json({ success: false, message: 'All fields are required (Name, Email, Subject, Department)' });
@@ -103,9 +107,9 @@ const addTeacher = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Email already exists' });
     }
 
-    // Generate a temporary random password server-side — admin cannot choose the password
-    const tempPassword = crypto.randomBytes(8).toString('hex');
-    const hashedPassword = await bcrypt.hash(tempPassword, 10);
+    // Use admin-assigned password if provided, otherwise generate a random password
+    const plainPassword = password || crypto.randomBytes(8).toString('hex');
+    const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
     const newUser = new User({
       name,
@@ -122,8 +126,13 @@ const addTeacher = async (req, res) => {
     });
     const savedTeacher = await newTeacher.save();
 
+    // Send email with login credentials
+    const { sendWelcomeEmail } = require('../utils/emailService');
+    await sendWelcomeEmail(email, name, 'teacher', plainPassword);
+
     res.json({ success: true, data: savedTeacher });
   } catch (error) {
+    console.error('Error adding teacher:', error);
     res.status(500).json({ success: false, message: 'Error adding teacher' });
   }
 };
@@ -342,6 +351,23 @@ const updateTeacher = async (req, res) => {
   }
 };
 
+const updateNotice = async (req, res) => {
+  try {
+    const { title, content } = req.body;
+    if (!title || !content) {
+      return res.status(400).json({ success: false, message: 'Title and Content are required' });
+    }
+    const notice = await Notice.findByIdAndUpdate(req.params.id, { title, content }, { new: true });
+    if (!notice) {
+      return res.status(404).json({ success: false, message: 'Notice not found' });
+    }
+    res.json({ success: true, data: notice });
+  } catch (error) {
+    console.error('Error updating notice:', error);
+    res.status(500).json({ success: false, message: 'Error updating notice' });
+  }
+};
+
 module.exports = {
   getAllStudents,
   addStudent,
@@ -352,7 +378,7 @@ module.exports = {
   deleteTeacher,
   updateTeacher,
   getStudentAttendance, getStudentMarks,
-  getAllNotices, createNotice, deleteNotice,
+  getAllNotices, createNotice, deleteNotice, updateNotice,
   getAllComplaints, updateComplaintStatus,
   uploadMaterial, getAllMaterials, deleteMaterial
 };

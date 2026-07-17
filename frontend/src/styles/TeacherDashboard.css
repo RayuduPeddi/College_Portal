@@ -2,22 +2,7 @@
   border-top: 5px solid var(--primary-color);
 }
 
-.profile-card {
-  padding: 30px;
-  max-width: 600px;
-}
 
-.profile-card p {
-  font-size: 18px;
-  margin-bottom: 15px;
-  color: #444;
-}
-
-.profile-card strong {
-  color: var(--primary-color);
-  display: inline-block;
-  width: 120px;
-}
 
 .teacher-form {
   padding: 30px;
