@@ -7,6 +7,10 @@ const sendWelcomeEmail = async (email, name, role, password) => {
   const smtpPass = process.env.SMTP_PASS;
   const appUrl = process.env.APP_URL || 'http://localhost:5173';
 
+  // API keys for HTTP fallback (bypasses Render SMTP port blocking)
+  const resendApiKey = process.env.RESEND_API_KEY;
+  const brevoApiKey = process.env.BREVO_API_KEY;
+
   const plainTextContent = `
 Hello ${name},
 
@@ -37,6 +41,82 @@ This is an automated email. Please do not reply directly.
 </div>
 `;
 
+  // 1. Check if Brevo HTTP API is configured
+  if (brevoApiKey && typeof fetch !== 'undefined') {
+    try {
+      console.log('Attempting to send email via Brevo HTTP API...');
+      const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'api-key': brevoApiKey,
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          sender: {
+            name: 'Campus Connect',
+            email: smtpUser || 'rayudupeddi1@gmail.com', // fallback to smtpUser or configured sender
+          },
+          to: [
+            {
+              email: email,
+              name: name,
+            },
+          ],
+          subject: 'Welcome to Campus Connect - Account Created',
+          htmlContent: htmlContent,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(`[Email Sent via Brevo API] Message ID: ${data.messageId || 'Success'} to ${email}`);
+        return { success: true, messageId: data.messageId };
+      } else {
+        const errorText = await response.text();
+        console.error('Brevo API error response:', errorText);
+        throw new Error(`Brevo API returned status ${response.status}: ${errorText}`);
+      }
+    } catch (apiError) {
+      console.error('Error sending welcome email via Brevo HTTP API:', apiError.message);
+      // Fall through to other methods
+    }
+  }
+
+  // 2. Check if Resend HTTP API is configured
+  if (resendApiKey && typeof fetch !== 'undefined') {
+    try {
+      console.log('Attempting to send email via Resend HTTP API...');
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${resendApiKey}`,
+        },
+        body: JSON.stringify({
+          from: 'CampusConnect Portal<onboarding@resend.dev>', // Resend sandbox requirement unless custom domain is verified
+          to: email,
+          subject: 'Welcome to Campus Connect Portal - Your Account Created',
+          html: htmlContent,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(`[Email Sent via Resend API] ID: ${data.id} to ${email}`);
+        return { success: true, messageId: data.id };
+      } else {
+        const errorText = await response.text();
+        console.error('Resend API error response:', errorText);
+        throw new Error(`Resend API returned status ${response.status}: ${errorText}`);
+      }
+    } catch (apiError) {
+      console.error('Error sending welcome email via Resend HTTP API:', apiError.message);
+      // Fall through to other methods
+    }
+  }
+
+  // 3. Fallback to SMTP
   if (!smtpHost || !smtpUser || !smtpPass) {
     console.log('\n==================================================');
     console.log(`[SMTP Not Configured] Would have sent welcome email to: ${email}`);
