@@ -49,14 +49,14 @@ This is an automated email. Please do not reply directly.
 
   try {
     const transporter = nodemailer.createTransport({
-      host: smtpHost,
-      port: smtpPort,
-      secure: smtpPort == 465, // true for 465, false for other ports
-      auth: {
-        user: smtpUser,
-        pass: smtpPass,
-      },
-    });
+  host: smtpHost,
+  port: Number(smtpPort),
+  secure: false,
+  auth: {
+    user: smtpUser,
+    pass: smtpPass,
+  },
+});
     
 //below 2lines added 
     await transporter.verify();
