@@ -57,6 +57,10 @@ This is an automated email. Please do not reply directly.
         pass: smtpPass,
       },
     });
+    
+//below 2lines added 
+    await transporter.verify();
+console.log("SMTP connected");
 
     const info = await transporter.sendMail({
       from: `"Campus Connect" <${smtpUser}>`,
